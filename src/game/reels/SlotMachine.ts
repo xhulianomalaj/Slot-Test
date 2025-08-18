@@ -58,6 +58,10 @@ export class SlotMachine extends PIXI.Container {
     return this._isSpinning;
   }
 
+  get paylineRenderer(): PaylineRenderer {
+    return this._paylineRenderer;
+  }
+
   /**
    * Set the state manager for this slot machine
    */

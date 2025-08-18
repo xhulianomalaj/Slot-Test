@@ -51,7 +51,7 @@ export class ReelAnimations {
     return new Promise<void>((resolve) => {
       // Accelerate to full speed
       gsap.to(this, {
-        _spinSpeed: 20, // pixels per frame
+        _spinSpeed: 25, // pixels per frame
         duration: 0.5,
         ease: "power2.out",
         onComplete: () => {

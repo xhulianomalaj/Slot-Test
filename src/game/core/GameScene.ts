@@ -125,9 +125,40 @@ export class GameScene extends PIXI.Container {
 
       // Add slot machine to the game area
       this.gameArea.addChild(this.slotMachine);
+
+      // Set up payline animation callbacks for button state management
+      this.setupPaylineAnimationCallbacks();
     } catch (error) {
       console.error("Failed to initialize slot machine:", error);
     }
+  }
+
+  /**
+   * Set up callbacks for payline animations to manage button states
+   */
+  private setupPaylineAnimationCallbacks(): void {
+    if (!this.slotMachine) return;
+
+    this.slotMachine.paylineRenderer.setAnimationCallbacks(
+      // On animation start - disable spin button
+      () => {
+        if (this.gameUI) {
+          this.gameUI.setSpinButtonState(false, "LINES");
+        }
+      },
+      // On animation end - re-enable spin button
+      () => {
+        if (this.gameUI) {
+          this.gameUI.setSpinButtonState(true, "SPIN");
+        }
+      },
+      // On animation skipped - also re-enable spin button
+      () => {
+        if (this.gameUI) {
+          this.gameUI.setSpinButtonState(true, "SPIN");
+        }
+      }
+    );
   }
 
   private initializeGameUI(): void {
