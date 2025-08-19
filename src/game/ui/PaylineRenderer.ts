@@ -24,8 +24,8 @@ export class PaylineRenderer extends PIXI.Container {
    * Setup container-level click handler for skipping animations
    */
   private setupContainerSkipHandler(): void {
-    this.eventMode = 'static';
-    this.on('pointerdown', () => {
+    this.eventMode = "static";
+    this.on("pointerdown", () => {
       if (this.animationController.isCurrentlyAnimating) {
         this.animationController.requestSkip();
       }
@@ -35,7 +35,11 @@ export class PaylineRenderer extends PIXI.Container {
   /**
    * Set callbacks for animation start/end events
    */
-  setAnimationCallbacks(onStart?: () => void, onEnd?: () => void, onSkipped?: () => void): void {
+  setAnimationCallbacks(
+    onStart?: () => void,
+    onEnd?: () => void,
+    onSkipped?: () => void
+  ): void {
     this.animationController.setAnimationCallbacks(onStart, onEnd, onSkipped);
   }
 
@@ -44,7 +48,8 @@ export class PaylineRenderer extends PIXI.Container {
    * Returns a promise that resolves when the animation sequence is complete
    */
   async showWinningPaylines(wins: WinResult[]): Promise<void> {
-    if (this.animationController.isCurrentlyAnimating || wins.length === 0) return;
+    if (this.animationController.isCurrentlyAnimating || wins.length === 0)
+      return;
 
     // Start animation sequence
     this.animationController.startAnimation();
@@ -86,7 +91,6 @@ export class PaylineRenderer extends PIXI.Container {
 
       // If we reach here without being skipped, we completed normally
       completedNormally = true;
-
     } finally {
       // End animation sequence with completion status
       this.animationController.endAnimation(completedNormally);
@@ -125,7 +129,6 @@ export class PaylineRenderer extends PIXI.Container {
         await this.animationController.skipableDelay(50);
       }
     }
-
   }
 
   /**

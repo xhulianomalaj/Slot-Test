@@ -339,7 +339,7 @@ export class GameScene extends PIXI.Container {
       // Only handle spacebar
       if (event.code === 'Space') {
         event.preventDefault(); // Prevent page scrolling
-        
+
         // Check if the spin button is enabled and can be clicked
         if (this.gameUI && this.stateManager.canSpin && this.stateManager.currentState === 'idle') {
           // console.log('🎮 Spacebar pressed - triggering spin');
