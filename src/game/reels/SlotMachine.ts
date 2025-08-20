@@ -204,6 +204,7 @@ export class SlotMachine extends PIXI.Container {
    */
   getCurrentSymbolGrid(): SymbolType[][] {
     const result = this._reels.map((reel) => reel.getVisibleSymbolTypes());
+
     return result;
   }
 

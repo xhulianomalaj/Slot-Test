@@ -8,12 +8,21 @@ pnpm-debug.log*
 lerna-debug.log*
 .kiro/
 
-node_modules
+node_modules/
+
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+.cache/
+.parcel-cache/
+
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,3 +32,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+Thumbs.db
+ehthumbs.db
