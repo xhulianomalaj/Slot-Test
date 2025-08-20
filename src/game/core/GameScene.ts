@@ -217,7 +217,6 @@ export class GameScene extends PIXI.Container {
     try {
       const spinResult = await this.slotMachine.spin();
 
-
       // Notify state machine that spin is complete
       this.stateManager.completeSpin(spinResult);
     } catch (error) {
@@ -339,14 +338,23 @@ export class GameScene extends PIXI.Container {
       switch (event.code) {
         case "Space":
           event.preventDefault(); // Prevent page scrolling
-          // Check if the spin button is enabled and can be clicked
+
+          // FIRST PRIORITY: If paylines are animating, skip them (same exact logic as click handler)
+          if (
+            this.slotMachine &&
+            this.slotMachine.paylineRenderer.isAnimating()
+          ) {
+            this.slotMachine.paylineRenderer.skipAnimation();
+            return; // Exit early, don't check anything else
+          }
+
+          // SECOND PRIORITY: Only then check if we can spin
           if (
             this.gameUI &&
             this.stateManager.canSpin &&
             this.stateManager.currentState === "idle"
           ) {
             this.stateManager.spin();
-          } else {
           }
           break;
       }

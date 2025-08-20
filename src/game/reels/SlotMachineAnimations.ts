@@ -87,13 +87,6 @@ export class SlotMachineAnimations {
 
     // Show winning paylines with animation and wait for completion
     await this._paylineRenderer.showWinningPaylines(spinResult.wins);
-
-    // Add celebration effects (we'll enhance this later with particles/glow)
-    const highestWin = WinEvaluator.getHighestWin(spinResult);
-    if (highestWin && highestWin.winAmount > 0) {
-      //   `🎉 WIN! ${highestWin.winAmount} coins on payline ${highestWin.payline}!`
-      // );
-    }
   }
 
   /**

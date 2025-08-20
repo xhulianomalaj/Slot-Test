@@ -251,6 +251,13 @@ export class PaylineRendererV5 extends PIXI.Container {
   }
 
   /**
+   * Check if paylines are currently animating (same method used by internal click handler)
+   */
+  isAnimating(): boolean {
+    return this.stateManager.isAnimating();
+  }
+
+  /**
    * Get current wins being displayed
    */
   getCurrentWins(): WinResult[] {
