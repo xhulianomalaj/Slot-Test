@@ -92,7 +92,6 @@ export class Reel extends PIXI.Container {
   getVisibleSymbolTypes(): SymbolType[] {
     const visibleSymbols = this.getVisibleSymbols();
     const symbolTypes = visibleSymbols.map((symbol) => symbol.type);
-    // console.log(
     //   `🔍 Reel ${this._reelIndex + 1} getVisibleSymbolTypes returning:`,
     //   symbolTypes
     // );

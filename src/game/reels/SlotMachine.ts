@@ -5,13 +5,12 @@ import { SymbolType } from "../../types";
 import type { SpinResult, WinResult } from "../../types";
 import { GAME_CONFIG } from "../config/GameConfig";
 import {
-  // getSymbolConfig,
   disableSymbolLogging,
   enableSymbolLogging,
 } from "../symbols/SymbolConfig";
 import { GameStateManager } from "../state/GameStateManager";
-import { WinEvaluator } from "../logic/WinEvaluator";
-import { PaylineRenderer } from "../ui/PaylineRenderer";
+import { WinEvaluator } from "../logic/WinEvaluatorV5";
+import { PaylineRendererV5 } from "../ui/PaylineRendererV5";
 import { SlotMachineRenderer } from "./SlotMachineRenderer";
 import { SlotMachineAnimations } from "./SlotMachineAnimations";
 
@@ -21,7 +20,7 @@ export class SlotMachine extends PIXI.Container {
   private _isSpinning: boolean = false;
   private _reelCount: number;
   private _rowCount: number;
-  private _paylineRenderer: PaylineRenderer;
+  private _paylineRenderer: PaylineRendererV5;
   private _stateManager: GameStateManager | null = null;
   private _renderer: SlotMachineRenderer;
   private _animations: SlotMachineAnimations;
@@ -33,7 +32,7 @@ export class SlotMachine extends PIXI.Container {
     this._stateManager = stateManager || null;
     this._reelCount = GAME_CONFIG.reels.count;
     this._rowCount = GAME_CONFIG.reels.rows;
-    this._paylineRenderer = new PaylineRenderer();
+    this._paylineRenderer = new PaylineRendererV5();
     this._renderer = new SlotMachineRenderer(this._reelCount, this._rowCount);
 
     this.createSlotMachineFrame();
@@ -58,7 +57,7 @@ export class SlotMachine extends PIXI.Container {
     return this._isSpinning;
   }
 
-  get paylineRenderer(): PaylineRenderer {
+  get paylineRenderer(): PaylineRendererV5 {
     return this._paylineRenderer;
   }
 
@@ -74,6 +73,17 @@ export class SlotMachine extends PIXI.Container {
    */
   getStateManager(): GameStateManager | null {
     return this._stateManager;
+  }
+
+  /**
+   * Set animation event callbacks (for UI integration)
+   */
+  setAnimationCallbacks(callbacks: {
+    onStart?: () => void;
+    onEnd?: () => void;
+    onSkipped?: () => void;
+  }): void {
+    this._animations.setAnimationCallbacks(callbacks);
   }
 
   /**
@@ -194,7 +204,6 @@ export class SlotMachine extends PIXI.Container {
    */
   getCurrentSymbolGrid(): SymbolType[][] {
     const result = this._reels.map((reel) => reel.getVisibleSymbolTypes());
-    // console.log("🔍 getCurrentSymbolGrid returning:", result);
     return result;
   }
 
@@ -282,20 +291,6 @@ export class SlotMachine extends PIXI.Container {
   endWinCelebration(): void {
     this._animations.endWinCelebration();
   }
-  /**
-   * Log the current visible symbols in the slot machine
-   */
-  // private logCurrentVisibleSymbols(): void {
-  // const actualVisibleSymbols = this.getCurrentSymbolGrid();
-  // console.log("🎰 Current Reel Symbols (3 symbols per reel):");
-  // actualVisibleSymbols.forEach((reelSymbols, reelIndex) => {
-  //   const symbolNames = reelSymbols.map((symbolType) => {
-  //     const config = getSymbolConfig(symbolType);
-  //     return config.name;
-  //   });
-  // console.log(`  Reel ${reelIndex + 1}: [${symbolNames.join(", ")}]`);
-  // });
-  // }
 
   /**
    * Cleanup resources

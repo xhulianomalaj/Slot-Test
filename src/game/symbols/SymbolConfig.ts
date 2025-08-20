@@ -148,7 +148,6 @@ export function generateRandomSymbol(): SymbolType {
       // When we have 3 visible symbols (complete reel), display them if logging is enabled
       if (randomCurrentReelSymbols.length === 3) {
         if (shouldLogSymbols) {
-          // console.log(
           //   `Reel ${reelNumber}: [${randomCurrentReelSymbols.join(", ")}]`
           // );
         }
@@ -193,7 +192,6 @@ export function generateOrderedSymbol(): SymbolType {
   // When we have 3 visible symbols (complete reel), display them if logging is enabled
   if (currentReelSymbols.length === 3) {
     if (shouldLogSymbols) {
-      // console.log(`Reel ${reelNumber}: [${currentReelSymbols.join(", ")}]`);
     }
     currentReelSymbols = []; // Reset for next reel
   }
@@ -212,7 +210,6 @@ export function resetOrderIndex(): void {
   randomCurrentReelSymbols = [];
   allGeneratedSymbols = [];
   if (shouldLogSymbols) {
-    // console.log("--- Visible Symbols (Random Generation) ---");
   }
 }
 

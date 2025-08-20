@@ -1,5 +1,5 @@
 import type { PaylineConfig } from "../../../types";
-import { ALL_PAYLINES } from "./HorizontalPaylines";
+import { ALL_PAYLINES } from "./Paylines";
 
 /**
  * Complete registry of all 20 payline configurations for a 5x3 slot machine
@@ -48,11 +48,4 @@ export function validatePaylineConfig(payline: PaylineConfig): boolean {
  */
 export function getPaylineCount(): number {
   return PAYLINE_CONFIGS.length;
-}
-
-/**
- * Get all paylines (now there's only one category)
- */
-export function getAllPaylines(): PaylineConfig[] {
-  return [...ALL_PAYLINES];
 }

@@ -26,7 +26,6 @@ export class SymbolFactory {
 
       await Promise.all(loadPromises);
       this.isInitialized = true;
-      // console.log('SymbolFactory initialized with individual PNG files');
     } catch (error) {
       console.error('Failed to initialize SymbolFactory:', error);
       throw error;

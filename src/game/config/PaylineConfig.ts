@@ -8,5 +8,4 @@ export {
   getAllPaylineConfigs,
   validatePaylineConfig,
   getPaylineCount,
-  getAllPaylines,
 } from "./paylines/PaylineRegistry";

@@ -1,6 +1,6 @@
 import type { SpinResult, WinResult } from "../../types";
-import { WinEvaluator } from "../logic/WinEvaluator";
-import { PaylineRenderer } from "../ui/PaylineRenderer";
+import { WinEvaluator } from "../logic/WinEvaluatorV5";
+import { PaylineRendererV5 } from "../ui/PaylineRendererV5";
 import { Reel } from "./Reel";
 
 /**
@@ -9,11 +9,39 @@ import { Reel } from "./Reel";
  */
 export class SlotMachineAnimations {
   private _reels: Reel[];
-  private _paylineRenderer: PaylineRenderer;
+  private _paylineRenderer: PaylineRendererV5;
+  private _animationCallbacks: {
+    onStart?: () => void;
+    onEnd?: () => void;
+    onSkipped?: () => void;
+  } = {};
 
-  constructor(reels: Reel[], paylineRenderer: PaylineRenderer) {
+  constructor(reels: Reel[], paylineRenderer: PaylineRendererV5) {
     this._reels = reels;
     this._paylineRenderer = paylineRenderer;
+    this.setupPaylineCallbacks();
+  }
+
+  /**
+   * Setup animation callbacks to integrate with game state
+   */
+  private setupPaylineCallbacks(): void {
+    this._paylineRenderer.setAnimationCallbacks(
+      () => this._animationCallbacks.onStart?.(),
+      () => this._animationCallbacks.onEnd?.(),
+      () => this._animationCallbacks.onSkipped?.()
+    );
+  }
+
+  /**
+   * Set animation event callbacks
+   */
+  setAnimationCallbacks(callbacks: {
+    onStart?: () => void;
+    onEnd?: () => void;
+    onSkipped?: () => void;
+  }): void {
+    this._animationCallbacks = { ...callbacks };
   }
 
   /**
@@ -63,10 +91,8 @@ export class SlotMachineAnimations {
     // Add celebration effects (we'll enhance this later with particles/glow)
     const highestWin = WinEvaluator.getHighestWin(spinResult);
     if (highestWin && highestWin.winAmount > 0) {
-      // console.log(
       //   `🎉 WIN! ${highestWin.winAmount} coins on payline ${highestWin.payline}!`
       // );
-      // console.log(`🎉 Payline animation sequence completed, celebration finished`);
     }
   }
 
@@ -75,7 +101,7 @@ export class SlotMachineAnimations {
    */
   endWinCelebration(): void {
     this.clearHighlights();
-    this._paylineRenderer.clearAllPaylines();
+    this._paylineRenderer.clearAll();
   }
 
   /**

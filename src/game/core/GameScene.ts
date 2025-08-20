@@ -3,7 +3,7 @@ import { SlotMachine } from "../reels/SlotMachine";
 import { SymbolFactory } from "../symbols/SymbolFactory";
 import { GameStateManager } from "../state/GameStateManager";
 import { GameUI } from "../../components/ui/GameUI";
-import { WinEvaluator } from "../logic/WinEvaluator";
+import { WinEvaluator } from "../logic/WinEvaluatorV5";
 import { setGenerationMode } from "../symbols/SymbolConfig";
 import type { SpinResult } from "../../types";
 
@@ -217,7 +217,6 @@ export class GameScene extends PIXI.Container {
     try {
       const spinResult = await this.slotMachine.spin();
 
-      // console.log("🎮 Spin completed with result:", spinResult);
 
       // Notify state machine that spin is complete
       this.stateManager.completeSpin(spinResult);
@@ -336,32 +335,33 @@ export class GameScene extends PIXI.Container {
    */
   private setupKeyboardControls(): void {
     this.keyboardHandler = (event: KeyboardEvent) => {
-      // Only handle spacebar
-      if (event.code === 'Space') {
-        event.preventDefault(); // Prevent page scrolling
-
-        // Check if the spin button is enabled and can be clicked
-        if (this.gameUI && this.stateManager.canSpin && this.stateManager.currentState === 'idle') {
-          // console.log('🎮 Spacebar pressed - triggering spin');
-          this.stateManager.spin();
-        } else {
-          // console.log('🎮 Spacebar pressed but spin not available');
-        }
+      // Only handle specific keys
+      switch (event.code) {
+        case "Space":
+          event.preventDefault(); // Prevent page scrolling
+          // Check if the spin button is enabled and can be clicked
+          if (
+            this.gameUI &&
+            this.stateManager.canSpin &&
+            this.stateManager.currentState === "idle"
+          ) {
+            this.stateManager.spin();
+          } else {
+          }
+          break;
       }
     };
 
     // Add the event listener to the window
-    window.addEventListener('keydown', this.keyboardHandler);
-    // console.log('🎮 Keyboard controls initialized - Spacebar to spin');
+    window.addEventListener("keydown", this.keyboardHandler);
   }
 
   // Cleanup method
   override destroy(): void {
     // Clean up keyboard event listener
     if (this.keyboardHandler) {
-      window.removeEventListener('keydown', this.keyboardHandler);
+      window.removeEventListener("keydown", this.keyboardHandler);
       this.keyboardHandler = null;
-      // console.log('🎮 Keyboard controls cleaned up');
     }
 
     // Unsubscribe from state manager
@@ -389,6 +389,5 @@ export class GameScene extends PIXI.Container {
    */
   public toggleGenerationMode(ordered: boolean = false): void {
     setGenerationMode(ordered);
-    // console.log(`🎲 Symbol generation mode: ${ordered ? "ORDERED" : "RANDOM"}`);
   }
 }
