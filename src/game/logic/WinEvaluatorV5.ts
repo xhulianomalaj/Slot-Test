@@ -14,20 +14,77 @@ import { GAME_CONFIG } from "../config/GameConfig";
  */
 export class WinEvaluatorV5 {
   /**
-   * Evaluate all paylines for wins based on the spin result
-   * This is the main evaluation method used by the state machine
+   * Evaluate all paylines for wins based on the current reel symbols
    */
-  static evaluateWins(reelResults: SymbolType[][]): WinResult[] {
-    const wins: WinResult[] = [];
+  public static evaluateWins(reelResults: SymbolType[][]): WinResult[] {
+    const paylines = GAME_CONFIG.paylines;
+    const allWins: WinResult[] = [];
 
-    for (const payline of GAME_CONFIG.paylines) {
+    // Evaluate each payline for wins
+    paylines.forEach((payline) => {
       const win = this.evaluatePayline(payline, reelResults);
       if (win) {
-        wins.push(win);
+        allWins.push(win);
+      }
+    });
+
+    // Remove overlapping wins
+    const deduplicatedWins = this.deduplicateOverlappingWins(allWins);
+
+    return deduplicatedWins;
+  }
+
+  /**
+   * Remove overlapping wins where one win's positions are completely contained within another
+   * Keeps wins that extend to different areas even if they share some positions
+   */
+  private static deduplicateOverlappingWins(wins: WinResult[]): WinResult[] {
+    if (wins.length <= 1) {
+      return wins;
+    }
+
+    // Sort wins by amount (highest first) to prioritize better wins
+    const sortedWins = [...wins].sort((a, b) => b.winAmount - a.winAmount);
+    const keptWins: WinResult[] = [];
+
+    for (const currentWin of sortedWins) {
+      // Check if this win is completely contained within any already kept win
+      const isContainedByKeptWin = keptWins.some((keptWin) =>
+        this.isWinCompletelyContainedBy(currentWin, keptWin)
+      );
+
+      // Check if any kept win is completely contained by this win
+      const containsKeptWin = keptWins.findIndex((keptWin) =>
+        this.isWinCompletelyContainedBy(keptWin, currentWin)
+      );
+
+      if (isContainedByKeptWin) {
+        // Skip this win - it's completely contained in a better win
+      } else if (containsKeptWin !== -1) {
+        // Remove the contained win and add this better one
+        keptWins.splice(containsKeptWin, 1);
+        keptWins.push(currentWin);
+      } else {
+        keptWins.push(currentWin);
       }
     }
 
-    return wins;
+    return keptWins;
+  }
+
+  /**
+   * Check if win1's positions are completely contained within win2's positions
+   */
+  private static isWinCompletelyContainedBy(
+    win1: WinResult,
+    win2: WinResult
+  ): boolean {
+    // Every position in win1 must exist in win2
+    return win1.positions.every((pos1) =>
+      win2.positions.some(
+        (pos2) => pos1.reel === pos2.reel && pos1.row === pos2.row
+      )
+    );
   }
 
   /**
@@ -51,7 +108,7 @@ export class WinEvaluatorV5 {
     for (let i = 0; i < paylines.length; i++) {
       const payline = paylines[i];
       const win = this.evaluatePayline(payline, reelResults);
-      
+
       if (win) {
         wins.push(win);
       }
@@ -61,11 +118,12 @@ export class WinEvaluatorV5 {
 
       // Add delay for visual effect
       if (delayMs > 0) {
-        await new Promise(resolve => setTimeout(resolve, delayMs));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
     }
 
-    return wins;
+    // Apply the same deduplication logic to progressive evaluation
+    return this.deduplicateOverlappingWins(wins);
   }
 
   /**
@@ -83,11 +141,6 @@ export class WinEvaluatorV5 {
       const symbol = reelResults[position.reel][position.row];
       symbols.push(symbol);
       positions.push(position);
-    }
-
-    // Debug: Log payline evaluation for specific paylines in development
-    if (process.env.NODE_ENV === "development" && (payline.id <= 5 || payline.id === 12)) {
-      // Payline evaluation logging removed
     }
 
     // Check for winning combinations (minimum 3 matching symbols from left)
@@ -117,10 +170,6 @@ export class WinEvaluatorV5 {
       positions: positions.slice(0, count), // Only include winning positions
     };
 
-    // Debug: Log the win result for all winning paylines in development
-    if (process.env.NODE_ENV === "development") {
-    }
-
     return result;
   }
 
@@ -131,7 +180,7 @@ export class WinEvaluatorV5 {
     paylineId: number,
     reelResults: SymbolType[][]
   ): WinResult | null {
-    const payline = GAME_CONFIG.paylines.find(p => p.id === paylineId);
+    const payline = GAME_CONFIG.paylines.find((p) => p.id === paylineId);
     if (!payline) {
       return null;
     }
@@ -253,7 +302,7 @@ export class WinEvaluatorV5 {
    */
   static getHighestWin(spinResult: SpinResult): WinResult | null {
     if (!spinResult.wins.length) return null;
-    return spinResult.wins.reduce((highest, current) => 
+    return spinResult.wins.reduce((highest, current) =>
       current.winAmount > highest.winAmount ? current : highest
     );
   }
@@ -270,15 +319,16 @@ export class WinEvaluatorV5 {
   } {
     const totalWin = this.calculateTotalWin(wins);
     const winCount = wins.length;
-    const bestWin = wins.reduce((best, current) => 
-      !best || current.winAmount > best.winAmount ? current : best, 
+    const bestWin = wins.reduce(
+      (best, current) =>
+        !best || current.winAmount > best.winAmount ? current : best,
       null as WinResult | null
     );
     const averageWin = winCount > 0 ? totalWin / winCount : 0;
 
     // Track which paylines are winning
     const paylineDistribution = new Map<number, number>();
-    wins.forEach(win => {
+    wins.forEach((win) => {
       paylineDistribution.set(win.payline, win.winAmount);
     });
 
@@ -294,14 +344,17 @@ export class WinEvaluatorV5 {
   /**
    * Validate a win result
    */
-  static validateWinResult(win: WinResult, reelResults: SymbolType[][]): boolean {
+  static validateWinResult(
+    win: WinResult,
+    reelResults: SymbolType[][]
+  ): boolean {
     try {
       // Check if positions are valid
       for (const position of win.positions) {
         if (
-          position.reel < 0 || 
+          position.reel < 0 ||
           position.reel >= reelResults.length ||
-          position.row < 0 || 
+          position.row < 0 ||
           position.row >= reelResults[position.reel].length
         ) {
           return false;
@@ -309,8 +362,8 @@ export class WinEvaluatorV5 {
       }
 
       // Verify the symbols match
-      const actualSymbols = win.positions.map(pos => 
-        reelResults[pos.reel][pos.row]
+      const actualSymbols = win.positions.map(
+        (pos) => reelResults[pos.reel][pos.row]
       );
 
       // Check if the symbols in the win result match actual reel results

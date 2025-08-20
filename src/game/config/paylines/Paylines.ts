@@ -17,7 +17,7 @@ export const ALL_PAYLINES: PaylineConfig[] = [
       { reel: 4, row: 1 },
     ],
   },
-  // Payline 2: Top row straight  
+  // Payline 2: Top row straight
   {
     id: 2,
     name: "Top Line",
@@ -32,7 +32,7 @@ export const ALL_PAYLINES: PaylineConfig[] = [
   // Payline 3: Bottom row straight
   {
     id: 3,
-    name: "Bottom Line", 
+    name: "Bottom Line",
     positions: [
       { reel: 0, row: 2 },
       { reel: 1, row: 2 },
@@ -109,7 +109,7 @@ export const ALL_PAYLINES: PaylineConfig[] = [
       { reel: 0, row: 1 },
       { reel: 1, row: 2 },
       { reel: 2, row: 1 },
-      { reel: 3, row: 2 },
+      { reel: 3, row: 0 },
       { reel: 4, row: 1 },
     ],
   },
@@ -120,8 +120,8 @@ export const ALL_PAYLINES: PaylineConfig[] = [
     positions: [
       { reel: 0, row: 0 },
       { reel: 1, row: 1 },
-      { reel: 2, row: 2 },
-      { reel: 3, row: 2 },
+      { reel: 2, row: 1 },
+      { reel: 3, row: 1 },
       { reel: 4, row: 2 },
     ],
   },
@@ -132,20 +132,20 @@ export const ALL_PAYLINES: PaylineConfig[] = [
     positions: [
       { reel: 0, row: 2 },
       { reel: 1, row: 1 },
-      { reel: 2, row: 0 },
-      { reel: 3, row: 0 },
+      { reel: 2, row: 1 },
+      { reel: 3, row: 1 },
       { reel: 4, row: 0 },
     ],
   },
-  // Payline 12: Top-top-middle-bottom-bottom
+  // Payline 12: Middle-Top-Top-Bottom-Bottom pattern
   {
     id: 12,
-    name: "Early Drop",
+    name: "Complex Zigzag",
     positions: [
-      { reel: 0, row: 0 },
+      { reel: 0, row: 1 },
       { reel: 1, row: 0 },
-      { reel: 2, row: 1 },
-      { reel: 3, row: 2 },
+      { reel: 2, row: 0 },
+      { reel: 3, row: 1 },
       { reel: 4, row: 2 },
     ],
   },
@@ -154,10 +154,10 @@ export const ALL_PAYLINES: PaylineConfig[] = [
     id: 13,
     name: "Early Rise",
     positions: [
-      { reel: 0, row: 2 },
+      { reel: 0, row: 1 },
       { reel: 1, row: 2 },
-      { reel: 2, row: 1 },
-      { reel: 3, row: 0 },
+      { reel: 2, row: 2 },
+      { reel: 3, row: 1 },
       { reel: 4, row: 0 },
     ],
   },
@@ -166,9 +166,9 @@ export const ALL_PAYLINES: PaylineConfig[] = [
     id: 14,
     name: "Late Drop",
     positions: [
-      { reel: 0, row: 0 },
+      { reel: 0, row: 1 },
       { reel: 1, row: 1 },
-      { reel: 2, row: 1 },
+      { reel: 2, row: 0 },
       { reel: 3, row: 1 },
       { reel: 4, row: 2 },
     ],
@@ -178,9 +178,9 @@ export const ALL_PAYLINES: PaylineConfig[] = [
     id: 15,
     name: "Late Rise",
     positions: [
-      { reel: 0, row: 2 },
+      { reel: 0, row: 1 },
       { reel: 1, row: 1 },
-      { reel: 2, row: 1 },
+      { reel: 2, row: 2 },
       { reel: 3, row: 1 },
       { reel: 4, row: 0 },
     ],
