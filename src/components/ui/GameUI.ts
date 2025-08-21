@@ -19,6 +19,17 @@ export class GameUI extends PIXI.Container {
   private betInput!: InputField;
   private winDisplay!: TextDisplay;
   private lastWinDisplay!: TextDisplay;
+  private linesWonDisplay!: TextDisplay;
+  private multiplierDisplay!: TextDisplay;
+
+  // Store current win information
+  private currentWinInfo: { linesWon: number; maxMultiplier: number } = {
+    linesWon: 0,
+    maxMultiplier: 0,
+  };
+
+  // Track initial balance for profit/loss calculation
+  private initialBalance: number;
 
   // Layout constants
   private readonly UI_WIDTH = 1200;
@@ -28,6 +39,9 @@ export class GameUI extends PIXI.Container {
     super();
 
     this.stateManager = stateManager;
+
+    // Store initial balance for profit/loss tracking
+    this.initialBalance = stateManager.context.balance;
 
     this.createUIComponents();
     this.setupLayout();
@@ -114,12 +128,32 @@ export class GameUI extends PIXI.Container {
       borderColor: 0x27ae60,
     });
 
-    this.lastWinDisplay = new TextDisplay("Last: $0", {
+    this.lastWinDisplay = new TextDisplay("+$0", {
       width: 100,
       height: 25,
       fontSize: 12,
       fontColor: 0xecf0f1,
       backgroundColor: 0x34495e,
+    });
+
+    // Lines won display
+    this.linesWonDisplay = new TextDisplay("0 LINES", {
+      width: 80,
+      height: 30,
+      fontSize: 11,
+      fontColor: 0xf39c12,
+      backgroundColor: 0x2c3e50,
+      borderColor: 0xf39c12,
+    });
+
+    // Multiplier display
+    this.multiplierDisplay = new TextDisplay("0X", {
+      width: 80,
+      height: 25,
+      fontSize: 12,
+      fontColor: 0xe74c3c,
+      backgroundColor: 0x2c3e50,
+      borderColor: 0xe74c3c,
     });
 
     // Add all components to container
@@ -131,6 +165,8 @@ export class GameUI extends PIXI.Container {
     this.addChild(this.betInput);
     this.addChild(this.winDisplay);
     this.addChild(this.lastWinDisplay);
+    this.addChild(this.linesWonDisplay);
+    this.addChild(this.multiplierDisplay);
   }
 
   private setupLayout(): void {
@@ -141,6 +177,13 @@ export class GameUI extends PIXI.Container {
     // Spin button in the center
     this.spinButton.x = centerX;
     this.spinButton.y = centerY;
+
+    // Lines won and multiplier displays to the right of spin button
+    this.linesWonDisplay.x = centerX + 150;
+    this.linesWonDisplay.y = centerY - 10;
+
+    this.multiplierDisplay.x = centerX + 150;
+    this.multiplierDisplay.y = centerY + 25;
 
     // Bet controls to the left of spin button
     const betControlsX = centerX - 200;
@@ -217,7 +260,6 @@ export class GameUI extends PIXI.Container {
     this.instantPlayToggle.onClick((isToggled: boolean) => {
       if (this.slotMachine) {
         this.slotMachine.instantPlayMode = isToggled;
-        console.log(`Instant Play ${isToggled ? "enabled" : "disabled"}`);
       } else {
         console.warn("SlotMachine not available for instant play toggle");
       }
@@ -234,11 +276,31 @@ export class GameUI extends PIXI.Container {
     // Update displays
     this.balanceDisplay.setCurrency(context.balance);
     // Don't automatically update betInput.value - let user control it
-    this.winDisplay.setCurrency(context.totalWin);
-    this.lastWinDisplay.setText(`Last: $${context.lastWin}`);
+
+    // Win display logic: Show current win amount when there's a win, but reset to 0 on new spins
+    const currentState = this.stateManager.currentState;
+    if (
+      context.lastWin > 0 &&
+      (currentState === "celebrating" || currentState === "idle")
+    ) {
+      this.winDisplay.setCurrency(context.lastWin);
+    } else {
+      this.winDisplay.setCurrency(0);
+    }
+
+    // Balance tracking display: Show total profit/loss since page load
+    const totalProfitLoss = context.balance - this.initialBalance;
+    const profitLossText =
+      totalProfitLoss >= 0
+        ? `+$${totalProfitLoss}`
+        : `-$${Math.abs(totalProfitLoss)}`;
+    this.lastWinDisplay.setText(profitLossText);
+
+    // Update lines won and multiplier displays
+    this.updateWinInformation(context);
 
     // Update button states based on game state and context
-    const currentState = this.stateManager.currentState;
+    // currentState is already declared above
 
     // Check if bet exceeds balance or is invalid (check input field state first)
     const betExceedsBalance = context.currentBet > context.balance;
@@ -289,6 +351,59 @@ export class GameUI extends PIXI.Container {
 
     // Flash the last win display
     this.lastWinDisplay.flash(0x2ecc71, 0.5);
+
+    // Flash the lines won and multiplier displays
+    this.linesWonDisplay.flash(0xf39c12, 0.5);
+    this.linesWonDisplay.pulse(1.2, 0.3);
+    this.multiplierDisplay.flash(0xe74c3c, 0.5);
+    this.multiplierDisplay.pulse(1.2, 0.3);
+  }
+
+  private updateWinInformation(context: GameContext): void {
+    // Check if we have fresh win data to capture
+    if (
+      context.reelResults &&
+      context.reelResults.wins &&
+      context.reelResults.wins.length > 0
+    ) {
+      const wins = context.reelResults.wins;
+      this.currentWinInfo.linesWon = wins.length;
+      // Sum all multipliers instead of taking the max
+      this.currentWinInfo.maxMultiplier = wins.reduce(
+        (sum, win) => sum + win.multiplier,
+        0
+      );
+    }
+
+    // Use stored win information if we have any
+    const currentState = this.stateManager.currentState;
+    const hasWins = this.currentWinInfo.linesWon > 0;
+    const isShowingWins =
+      currentState === "celebrating" ||
+      (context.lastWin > 0 && currentState === "idle");
+
+    if (hasWins && isShowingWins) {
+      // Update lines won display
+      const lineText =
+        this.currentWinInfo.linesWon === 1
+          ? "1 LINE"
+          : `${this.currentWinInfo.linesWon} LINES`;
+      this.linesWonDisplay.setText(lineText);
+
+      // Update multiplier display
+      this.multiplierDisplay.setText(`${this.currentWinInfo.maxMultiplier}X`);
+
+      // Make displays visible when there are wins
+      this.linesWonDisplay.alpha = 1.0;
+      this.multiplierDisplay.alpha = 1.0;
+    } else if (!isShowingWins) {
+      // Clear win info when not showing wins (new spin started)
+      this.currentWinInfo = { linesWon: 0, maxMultiplier: 0 };
+      this.linesWonDisplay.setText("0 LINES");
+      this.multiplierDisplay.setText("0X");
+      this.linesWonDisplay.alpha = 0.5;
+      this.multiplierDisplay.alpha = 0.5;
+    }
   }
 
   // Public methods for external control

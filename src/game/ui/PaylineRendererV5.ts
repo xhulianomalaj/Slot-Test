@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import type { WinResult } from "../../types";
 import { PaylineStateManager } from "../state/PaylineStateManager";
 import { PaylineDrawing } from "./PaylineDrawing";
+import type { GameStateManager } from "../state/GameStateManager";
 
 /**
  * PaylineRenderer using XState v5 for state management
@@ -9,6 +10,7 @@ import { PaylineDrawing } from "./PaylineDrawing";
  */
 export class PaylineRendererV5 extends PIXI.Container {
   private stateManager: PaylineStateManager;
+  private gameStateManager: GameStateManager | undefined;
   private drawing: PaylineDrawing;
   private currentWins: WinResult[] = [];
   private isShowingAll: boolean = false;
@@ -21,9 +23,11 @@ export class PaylineRendererV5 extends PIXI.Container {
   // Global click handler for skip functionality
   private globalClickHandler?: () => void;
 
-  constructor() {
+  constructor(gameStateManager?: GameStateManager) {
     super();
     this.name = "PaylineRendererV5";
+
+    this.gameStateManager = gameStateManager;
 
     // Initialize state manager and drawing
     this.stateManager = new PaylineStateManager();
@@ -187,7 +191,9 @@ export class PaylineRendererV5 extends PIXI.Container {
    * Start payline evaluation for given reel results
    */
   evaluateAndShowPaylines(reelResults: any[][]): void {
-    this.stateManager.evaluatePaylines(reelResults);
+    // Get current bet from game state manager, fallback to config default
+    const currentBet = this.gameStateManager?.currentBet ?? 20;
+    this.stateManager.evaluatePaylines(reelResults, currentBet);
   }
 
   /**

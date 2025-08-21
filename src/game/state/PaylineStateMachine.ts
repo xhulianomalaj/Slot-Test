@@ -24,7 +24,11 @@ export interface PaylineContext {
 
 // Payline state machine events
 export type PaylineEvent =
-  | { type: "EVALUATE_PAYLINES"; reelResults: SymbolType[][] }
+  | {
+      type: "EVALUATE_PAYLINES";
+      reelResults: SymbolType[][];
+      currentBet: number;
+    }
   | { type: "SET_WINS_AND_ANIMATE"; wins: WinResult[] }
   | { type: "SKIP_ANIMATION" }
   | { type: "RESET" }
@@ -68,12 +72,14 @@ const showAllWinsActor = fromPromise(
 );
 
 // Evaluation actor (dynamic import for better performance)
-const evaluatePaylineActor = fromPromise(
+// Actor for evaluating paylines
+export const evaluatePaylines = fromPromise(
   async ({
     input,
   }: {
     input: {
       reelResults: SymbolType[][];
+      currentBet: number;
       onProgress?: (
         progress: number,
         total: number,
@@ -87,7 +93,8 @@ const evaluatePaylineActor = fromPromise(
 
       // Evaluate paylines and get wins
       const result = await WinEvaluatorV5.evaluateWinsProgressive(
-        input.reelResults
+        input.reelResults,
+        input.currentBet
       );
 
       return { wins: result, evaluatedPaylines: [] };
@@ -146,9 +153,11 @@ export const paylineStateMachine = createMachine(
         entry: "startAnimation",
         invoke: {
           id: "evaluatePaylines",
-          src: evaluatePaylineActor,
-          input: ({ context }) => ({
+          src: evaluatePaylines,
+          input: ({ context, event }) => ({
             reelResults: context.reelResults!,
+            currentBet:
+              event.type === "EVALUATE_PAYLINES" ? event.currentBet : 20, // fallback to default
             onProgress: (
               _progress: number,
               _total: number,

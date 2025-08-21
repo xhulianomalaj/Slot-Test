@@ -125,6 +125,7 @@ export const gameStateMachine = createMachine(
         balance: context.balance - context.currentBet,
         canSpin: false,
         isSpinning: true,
+        lastWin: 0, // Clear previous win when new spin starts
       })),
       addWinnings: assign(({ context }) => {
         const winAmount = context.reelResults?.totalWin || 0;

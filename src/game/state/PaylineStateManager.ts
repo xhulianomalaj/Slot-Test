@@ -141,10 +141,11 @@ export class PaylineStateManager {
     });
   }
 
-  evaluatePaylines(reelResults: SymbolType[][]): void {
+  evaluatePaylines(reelResults: SymbolType[][], currentBet: number): void {
     this.actor.send({
       type: "EVALUATE_PAYLINES",
       reelResults,
+      currentBet,
     });
   }
 

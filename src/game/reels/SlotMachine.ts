@@ -33,7 +33,7 @@ export class SlotMachine extends PIXI.Container {
     this._stateManager = stateManager || null;
     this._reelCount = GAME_CONFIG.reels.count;
     this._rowCount = GAME_CONFIG.reels.rows;
-    this._paylineRenderer = new PaylineRendererV5();
+    this._paylineRenderer = new PaylineRendererV5(stateManager);
     this._renderer = new SlotMachineRenderer(this._reelCount, this._rowCount);
 
     this.createSlotMachineFrame();
@@ -192,8 +192,15 @@ export class SlotMachine extends PIXI.Container {
       // Get the actual visible symbols from the reels after stopping
       const actualVisibleSymbols = this.getCurrentSymbolGrid();
 
-      // Create spin result with win evaluation using actual visible symbols
-      const spinResult = WinEvaluator.createSpinResult(actualVisibleSymbols);
+      // Get current bet from state manager, fall back to default if not available
+      const currentBet =
+        this._stateManager?.currentBet ?? GAME_CONFIG.betting.defaultBet;
+
+      // Create spin result with win evaluation using actual visible symbols and current bet
+      const spinResult = WinEvaluator.createSpinResult(
+        actualVisibleSymbols,
+        currentBet
+      );
 
       // Re-enable symbol logging after animations complete
       enableSymbolLogging();
@@ -231,8 +238,15 @@ export class SlotMachine extends PIXI.Container {
       // Get the actual visible symbols from the reels after stopping
       const actualVisibleSymbols = this.getCurrentSymbolGrid();
 
-      // Create spin result with win evaluation using actual visible symbols
-      const spinResult = WinEvaluator.createSpinResult(actualVisibleSymbols);
+      // Get current bet from state manager, fall back to default if not available
+      const currentBet =
+        this._stateManager?.currentBet ?? GAME_CONFIG.betting.defaultBet;
+
+      // Create spin result with win evaluation using actual visible symbols and current bet
+      const spinResult = WinEvaluator.createSpinResult(
+        actualVisibleSymbols,
+        currentBet
+      );
 
       // Re-enable symbol logging after animations complete
       enableSymbolLogging();

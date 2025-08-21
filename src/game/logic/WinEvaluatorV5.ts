@@ -16,13 +16,16 @@ export class WinEvaluatorV5 {
   /**
    * Evaluate all paylines for wins based on the current reel symbols
    */
-  public static evaluateWins(reelResults: SymbolType[][]): WinResult[] {
+  public static evaluateWins(
+    reelResults: SymbolType[][],
+    currentBet: number
+  ): WinResult[] {
     const paylines = GAME_CONFIG.paylines;
     const allWins: WinResult[] = [];
 
     // Evaluate each payline for wins
     paylines.forEach((payline) => {
-      const win = this.evaluatePayline(payline, reelResults);
+      const win = this.evaluatePayline(payline, reelResults, currentBet);
       if (win) {
         allWins.push(win);
       }
@@ -93,6 +96,7 @@ export class WinEvaluatorV5 {
    */
   static async evaluateWinsProgressive(
     reelResults: SymbolType[][],
+    currentBet: number,
     onProgress?: (
       progress: number,
       totalPaylines: number,
@@ -107,7 +111,7 @@ export class WinEvaluatorV5 {
 
     for (let i = 0; i < paylines.length; i++) {
       const payline = paylines[i];
-      const win = this.evaluatePayline(payline, reelResults);
+      const win = this.evaluatePayline(payline, reelResults, currentBet);
 
       if (win) {
         wins.push(win);
@@ -131,7 +135,8 @@ export class WinEvaluatorV5 {
    */
   private static evaluatePayline(
     payline: PaylineConfig,
-    reelResults: SymbolType[][]
+    reelResults: SymbolType[][],
+    currentBet: number
   ): WinResult | null {
     const symbols: SymbolType[] = [];
     const positions: Position[] = [];
@@ -157,10 +162,8 @@ export class WinEvaluatorV5 {
       return null;
     }
 
-    // Calculate win amount (multiplier * bet per line)
-    const betPerLine =
-      GAME_CONFIG.betting.defaultBet / GAME_CONFIG.betting.linesPerSpin;
-    const winAmount = multiplier * betPerLine;
+    // Calculate win amount (multiplier * total bet amount)
+    const winAmount = multiplier * currentBet;
 
     const result = {
       payline: payline.id,
@@ -178,21 +181,25 @@ export class WinEvaluatorV5 {
    */
   static evaluateSpecificPayline(
     paylineId: number,
-    reelResults: SymbolType[][]
+    reelResults: SymbolType[][],
+    currentBet: number
   ): WinResult | null {
     const payline = GAME_CONFIG.paylines.find((p) => p.id === paylineId);
     if (!payline) {
       return null;
     }
 
-    return this.evaluatePayline(payline, reelResults);
+    return this.evaluatePayline(payline, reelResults, currentBet);
   }
 
   /**
    * Get all paylines that would win for given reel results
    * Returns both winning and non-winning paylines with metadata
    */
-  static analyzeAllPaylines(reelResults: SymbolType[][]): {
+  static analyzeAllPaylines(
+    reelResults: SymbolType[][],
+    currentBet: number
+  ): {
     wins: WinResult[];
     allResults: Array<{
       payline: PaylineConfig;
@@ -212,7 +219,7 @@ export class WinEvaluatorV5 {
     let totalWinAmount = 0;
 
     for (const payline of GAME_CONFIG.paylines) {
-      const result = this.evaluatePayline(payline, reelResults);
+      const result = this.evaluatePayline(payline, reelResults, currentBet);
       const hasWin = !!result;
 
       allResults.push({
@@ -279,8 +286,11 @@ export class WinEvaluatorV5 {
   /**
    * Create a complete spin result with win evaluation
    */
-  static createSpinResult(reelResults: SymbolType[][]): SpinResult {
-    const wins = this.evaluateWins(reelResults);
+  static createSpinResult(
+    reelResults: SymbolType[][],
+    currentBet: number
+  ): SpinResult {
+    const wins = this.evaluateWins(reelResults, currentBet);
     const totalWin = this.calculateTotalWin(wins);
 
     return {
