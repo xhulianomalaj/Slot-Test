@@ -111,7 +111,7 @@ export const gameStateMachine = createMachine(
       hasWins: ({ context }) =>
         context.reelResults !== null && context.reelResults.totalWin > 0,
       canIncreaseBet: ({ context }) =>
-        context.currentBet < 100 && context.balance >= context.currentBet + 1,
+        context.balance >= context.currentBet + 5,
       canDecreaseBet: ({ context }) => context.currentBet > 1,
     },
     actions: {
@@ -151,7 +151,7 @@ export const gameStateMachine = createMachine(
         reelResults: null,
       })),
       increaseBet: assign(({ context }) => {
-        const newBet = Math.min(100, context.currentBet + 1);
+        const newBet = context.currentBet + 5;
         return {
           ...context,
           currentBet: newBet,
@@ -159,7 +159,7 @@ export const gameStateMachine = createMachine(
         };
       }),
       decreaseBet: assign(({ context }) => {
-        const newBet = Math.max(1, context.currentBet - 1);
+        const newBet = Math.max(1, context.currentBet - 5);
         return {
           ...context,
           currentBet: newBet,
@@ -168,7 +168,7 @@ export const gameStateMachine = createMachine(
       }),
       setBet: assign(({ context, event }) => {
         if (event.type === "SET_BET") {
-          const newBet = Math.max(1, Math.min(100, event.amount));
+          const newBet = event.amount; // Remove automatic clamping - let UI handle validation
           return {
             ...context,
             currentBet: newBet,

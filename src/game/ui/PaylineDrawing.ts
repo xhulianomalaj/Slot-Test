@@ -21,7 +21,7 @@ export class PaylineDrawing {
    */
   public calculateAnimationDuration(positions: Position[]): number {
     const totalSegments = positions.length - 1;
-    const segmentDuration = 0.3; // Must match animateLineDrawing (in seconds)
+    const segmentDuration = 0.15; // Reduced from 0.3 to 0.15 for faster drawing
     const pulsingDuration = 0.4; // Duration of each pulse (in seconds)
     const pulsingRepeats = 2; // Number of repeats
     const pulsingRepeatDelay = 0.1; // Delay between repeats (in seconds)
@@ -89,7 +89,7 @@ export class PaylineDrawing {
 
       let currentSegment = 0;
       const totalSegments = positions.length - 1;
-      const segmentDuration = 0.3; // Increased from 0.1 to 0.3 - slower drawing
+      const segmentDuration = 0.15; // Reduced from 0.3 to 0.15 for faster drawing
 
       const drawNextSegment = () => {
         if (currentSegment >= totalSegments) {

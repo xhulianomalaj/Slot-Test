@@ -1,5 +1,5 @@
-import * as PIXI from 'pixi.js';
-import { gsap } from 'gsap';
+import * as PIXI from "pixi.js";
+import { gsap } from "gsap";
 
 export interface ButtonOptions {
   width?: number;
@@ -36,7 +36,7 @@ export class Button extends PIXI.Container {
       disabledColor: 0x999999,
       textColor: 0xffffff,
       fontSize: 16,
-      text: 'Button',
+      text: "Button",
       borderRadius: 8,
       borderWidth: 0,
       borderColor: 0x000000,
@@ -49,8 +49,8 @@ export class Button extends PIXI.Container {
       style: {
         fontSize: this.options.fontSize,
         fill: this.options.textColor,
-        fontFamily: 'Arial, sans-serif',
-        fontWeight: 'bold',
+        fontFamily: "Arial, sans-serif",
+        fontWeight: "bold",
       },
     });
 
@@ -62,46 +62,46 @@ export class Button extends PIXI.Container {
   }
 
   private setupInteractivity(): void {
-    this.eventMode = 'static';
-    this.cursor = 'pointer';
+    this.eventMode = "static";
+    this.cursor = "pointer";
 
-    this.on('pointerdown', this.onPointerDown.bind(this));
-    this.on('pointerup', this.onPointerUp.bind(this));
-    this.on('pointerupoutside', this.onPointerUpOutside.bind(this));
-    this.on('pointerover', this.onPointerOver.bind(this));
-    this.on('pointerout', this.onPointerOut.bind(this));
+    this.on("pointerdown", this.onPointerDown.bind(this));
+    this.on("pointerup", this.onPointerUp.bind(this));
+    this.on("pointerupoutside", this.onPointerUpOutside.bind(this));
+    this.on("pointerover", this.onPointerOver.bind(this));
+    this.on("pointerout", this.onPointerOut.bind(this));
   }
 
   private onPointerDown(): void {
     if (!this._enabled) return;
-    
+
     this._isPressed = true;
     this.updateVisuals();
-    
+
     // Scale down animation
     gsap.to(this.scale, {
       x: 0.95,
       y: 0.95,
       duration: 0.1,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }
 
   private onPointerUp(): void {
     if (!this._enabled) return;
-    
+
     if (this._isPressed) {
       this._isPressed = false;
       this.updateVisuals();
-      
+
       // Scale back up animation
       gsap.to(this.scale, {
         x: 1,
         y: 1,
         duration: 0.1,
-        ease: 'power2.out',
+        ease: "power2.out",
       });
-      
+
       // Trigger click callback
       if (this.clickCallback) {
         this.clickCallback();
@@ -111,46 +111,46 @@ export class Button extends PIXI.Container {
 
   private onPointerUpOutside(): void {
     if (!this._enabled) return;
-    
+
     this._isPressed = false;
     this.updateVisuals();
-    
+
     // Scale back up animation
     gsap.to(this.scale, {
       x: 1,
       y: 1,
       duration: 0.1,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }
 
   private onPointerOver(): void {
     if (!this._enabled) return;
-    
+
     this._isHovered = true;
     this.updateVisuals();
-    
+
     // Hover animation
     gsap.to(this.scale, {
       x: 1.05,
       y: 1.05,
       duration: 0.2,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }
 
   private onPointerOut(): void {
     if (!this._enabled) return;
-    
+
     this._isHovered = false;
     this.updateVisuals();
-    
+
     // Return to normal scale
     gsap.to(this.scale, {
       x: 1,
       y: 1,
       duration: 0.2,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }
 
@@ -158,7 +158,7 @@ export class Button extends PIXI.Container {
     this.background.clear();
 
     let backgroundColor = this.options.backgroundColor;
-    
+
     if (!this._enabled) {
       backgroundColor = this.options.disabledColor;
     } else if (this._isPressed) {
@@ -201,7 +201,7 @@ export class Button extends PIXI.Container {
     this.textLabel.y = 0;
 
     // Update cursor
-    this.cursor = this._enabled ? 'pointer' : 'default';
+    this.cursor = this._enabled ? "pointer" : "default";
   }
 
   // Public methods
@@ -223,6 +223,13 @@ export class Button extends PIXI.Container {
     this.options.text = value;
   }
 
+  setTextWithFontSize(value: string, fontSize: number): void {
+    this.textLabel.text = value;
+    this.textLabel.style.fontSize = fontSize;
+    this.options.text = value;
+    this.options.fontSize = fontSize;
+  }
+
   onClick(callback: () => void): void {
     this.clickCallback = callback;
   }
@@ -233,8 +240,13 @@ export class Button extends PIXI.Container {
     this.updateVisuals();
   }
 
-  setColors(backgroundColor?: number, hoverColor?: number, disabledColor?: number): void {
-    if (backgroundColor !== undefined) this.options.backgroundColor = backgroundColor;
+  setColors(
+    backgroundColor?: number,
+    hoverColor?: number,
+    disabledColor?: number
+  ): void {
+    if (backgroundColor !== undefined)
+      this.options.backgroundColor = backgroundColor;
     if (hoverColor !== undefined) this.options.hoverColor = hoverColor;
     if (disabledColor !== undefined) this.options.disabledColor = disabledColor;
     this.updateVisuals();

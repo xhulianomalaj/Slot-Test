@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Button } from "./Button";
 import { TextDisplay } from "./TextDisplay";
+import { InputField } from "./InputField";
 import { GameStateManager, type GameContext } from "../../game/state";
 
 export class GameUI extends PIXI.Container {
@@ -11,7 +12,7 @@ export class GameUI extends PIXI.Container {
   private increaseBetButton!: Button;
   private decreaseBetButton!: Button;
   private balanceDisplay!: TextDisplay;
-  private betDisplay!: TextDisplay;
+  private betInput!: InputField;
   private winDisplay!: TextDisplay;
   private lastWinDisplay!: TextDisplay;
 
@@ -71,7 +72,7 @@ export class GameUI extends PIXI.Container {
       borderColor: 0xf39c12,
     });
 
-    this.betDisplay = new TextDisplay("$25", {
+    this.betInput = new InputField("10", {
       width: 80,
       height: 30,
       fontSize: 14,
@@ -101,7 +102,7 @@ export class GameUI extends PIXI.Container {
     this.addChild(this.increaseBetButton);
     this.addChild(this.decreaseBetButton);
     this.addChild(this.balanceDisplay);
-    this.addChild(this.betDisplay);
+    this.addChild(this.betInput);
     this.addChild(this.winDisplay);
     this.addChild(this.lastWinDisplay);
   }
@@ -120,8 +121,8 @@ export class GameUI extends PIXI.Container {
     this.decreaseBetButton.x = betControlsX - 100;
     this.decreaseBetButton.y = centerY;
 
-    this.betDisplay.x = betControlsX - 37;
-    this.betDisplay.y = centerY;
+    this.betInput.x = betControlsX - 77;
+    this.betInput.y = centerY - 15;
 
     this.increaseBetButton.x = betControlsX + 25;
     this.increaseBetButton.y = centerY;
@@ -149,10 +150,37 @@ export class GameUI extends PIXI.Container {
     // Bet control buttons
     this.increaseBetButton.onClick(() => {
       this.stateManager.increaseBet();
+      // Update the input field to reflect the new bet value
+      this.betInput.value = this.stateManager.context.currentBet.toString();
     });
 
     this.decreaseBetButton.onClick(() => {
       this.stateManager.decreaseBet();
+      // Update the input field to reflect the new bet value
+      this.betInput.value = this.stateManager.context.currentBet.toString();
+    });
+
+    // Bet input field
+    this.betInput.onChange((value: string) => {
+      if (value === "" || value.trim() === "") {
+        // Don't call setBet when field is empty - just force UI update
+        this.updateUI(this.stateManager.context);
+        return;
+      }
+      const numValue = parseInt(value) || 0;
+      // Remove range constraint - allow any value for proper validation
+      this.stateManager.setBet(numValue);
+    });
+
+    this.betInput.onEnter((value: string) => {
+      if (value === "" || value.trim() === "") {
+        // Don't set any value when empty - just let validation handle it
+        return;
+      }
+      const numValue = parseInt(value) || 0;
+      // Remove automatic clamping - let the user enter any value
+      this.stateManager.setBet(numValue);
+      this.betInput.value = numValue.toString();
     });
   }
 
@@ -165,29 +193,42 @@ export class GameUI extends PIXI.Container {
   private updateUI(context: GameContext): void {
     // Update displays
     this.balanceDisplay.setCurrency(context.balance);
-    this.betDisplay.setCurrency(context.currentBet);
+    // Don't automatically update betInput.value - let user control it
     this.winDisplay.setCurrency(context.totalWin);
     this.lastWinDisplay.setText(`Last: $${context.lastWin}`);
 
     // Update button states based on game state and context
     const currentState = this.stateManager.currentState;
 
-    // Spin button state
-    this.spinButton.enabled = context.canSpin && currentState === "idle";
+    // Check if bet exceeds balance or is invalid (check input field state first)
+    const betExceedsBalance = context.currentBet > context.balance;
+    const invalidBet =
+      context.currentBet <= 0 ||
+      this.betInput.value === "" ||
+      this.betInput.value.trim() === "";
+
+    // Spin button state - disable if bet exceeds balance, is invalid, or other conditions
+    this.spinButton.enabled =
+      context.canSpin &&
+      currentState === "idle" &&
+      !betExceedsBalance &&
+      !invalidBet;
 
     if (context.isSpinning) {
-      this.spinButton.text = "SPINNING...";
+      this.spinButton.setTextWithFontSize("SPINNING...", 18);
+    } else if (invalidBet) {
+      this.spinButton.setTextWithFontSize("ENTER BET", 16);
+    } else if (betExceedsBalance) {
+      this.spinButton.setTextWithFontSize("BET TOO HIGH", 14); // Smaller font size
     } else if (!context.canSpin && context.balance < context.currentBet) {
-      this.spinButton.text = "NO FUNDS";
+      this.spinButton.setTextWithFontSize("NO FUNDS", 18);
     } else {
-      this.spinButton.text = "SPIN";
+      this.spinButton.setTextWithFontSize("SPIN", 18);
     }
 
     // Bet control buttons
     this.increaseBetButton.enabled =
-      currentState === "idle" &&
-      context.currentBet < 100 &&
-      context.balance >= context.currentBet + 1;
+      currentState === "idle" && context.balance >= context.currentBet + 5;
 
     this.decreaseBetButton.enabled =
       currentState === "idle" && context.currentBet > 1;

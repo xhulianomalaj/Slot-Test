@@ -17,8 +17,8 @@ export const GAME_CONFIG: GameConfig = {
     linesPerSpin: 20, // All paylines active
   },
   animations: {
-    spinDuration: 2000,
-    reelStopDelay: 500,
+    spinDuration: 1000,
+    reelStopDelay: 400,
     winCelebrationDuration: 2000,
   },
   symbols: SYMBOL_CONFIGS,
