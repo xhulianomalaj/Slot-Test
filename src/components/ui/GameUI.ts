@@ -2,15 +2,19 @@ import * as PIXI from "pixi.js";
 import { Button } from "./Button";
 import { TextDisplay } from "./TextDisplay";
 import { InputField } from "./InputField";
+import { ToggleButton } from "./ToggleButton";
 import { GameStateManager, type GameContext } from "../../game/state";
+import type { SlotMachine } from "../../game/reels/SlotMachine";
 
 export class GameUI extends PIXI.Container {
   private stateManager: GameStateManager;
+  private slotMachine: SlotMachine | null = null;
 
   // UI Components
   private spinButton!: Button;
   private increaseBetButton!: Button;
   private decreaseBetButton!: Button;
+  private instantPlayToggle!: ToggleButton;
   private balanceDisplay!: TextDisplay;
   private betInput!: InputField;
   private winDisplay!: TextDisplay;
@@ -29,6 +33,13 @@ export class GameUI extends PIXI.Container {
     this.setupLayout();
     this.setupEventHandlers();
     this.subscribeToStateChanges();
+  }
+
+  /**
+   * Set the slot machine reference for instant play functionality
+   */
+  public setSlotMachine(slotMachine: SlotMachine): void {
+    this.slotMachine = slotMachine;
   }
 
   private createUIComponents(): void {
@@ -60,6 +71,20 @@ export class GameUI extends PIXI.Container {
       fontSize: 16,
       backgroundColor: 0x3498db,
       hoverColor: 0x2980b9,
+    });
+
+    // Instant Play toggle button
+    this.instantPlayToggle = new ToggleButton({
+      width: 120,
+      height: 35,
+      onText: "INSTANT PLAY ON",
+      offText: "INSTANT PLAY OFF",
+      onColor: 0x28a745,
+      offColor: 0x95a5a6,
+      onHoverColor: 0x00cc00,
+      offHoverColor: 0x7f8c8d,
+      fontSize: 12,
+      defaultState: false,
     });
 
     // Display components
@@ -101,6 +126,7 @@ export class GameUI extends PIXI.Container {
     this.addChild(this.spinButton);
     this.addChild(this.increaseBetButton);
     this.addChild(this.decreaseBetButton);
+    this.addChild(this.instantPlayToggle);
     this.addChild(this.balanceDisplay);
     this.addChild(this.betInput);
     this.addChild(this.winDisplay);
@@ -137,6 +163,10 @@ export class GameUI extends PIXI.Container {
 
     this.lastWinDisplay.x = centerX + 300;
     this.lastWinDisplay.y = centerY + 30;
+
+    // Instant Play toggle to the right of win displays
+    this.instantPlayToggle.x = centerX + 450;
+    this.instantPlayToggle.y = centerY + 10;
   }
 
   private setupEventHandlers(): void {
@@ -181,6 +211,16 @@ export class GameUI extends PIXI.Container {
       // Remove automatic clamping - let the user enter any value
       this.stateManager.setBet(numValue);
       this.betInput.value = numValue.toString();
+    });
+
+    // Instant Play toggle
+    this.instantPlayToggle.onClick((isToggled: boolean) => {
+      if (this.slotMachine) {
+        this.slotMachine.instantPlayMode = isToggled;
+        console.log(`Instant Play ${isToggled ? "enabled" : "disabled"}`);
+      } else {
+        console.warn("SlotMachine not available for instant play toggle");
+      }
     });
   }
 
@@ -233,6 +273,9 @@ export class GameUI extends PIXI.Container {
     this.decreaseBetButton.enabled =
       currentState === "idle" && context.currentBet > 1;
 
+    // Instant Play toggle - disable during spinning
+    this.instantPlayToggle.enabled = currentState === "idle";
+
     // Animate win display when there's a new win
     if (context.lastWin > 0 && currentState === "celebrating") {
       this.animateWin(context.lastWin);
@@ -267,6 +310,15 @@ export class GameUI extends PIXI.Container {
     if (text) {
       this.spinButton.text = text;
     }
+  }
+
+  // Instant Play control methods
+  public get isInstantPlayEnabled(): boolean {
+    return this.instantPlayToggle.isToggled;
+  }
+
+  public setInstantPlay(enabled: boolean): void {
+    this.instantPlayToggle.isToggled = enabled;
   }
 
   // Get UI dimensions for layout purposes

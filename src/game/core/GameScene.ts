@@ -165,6 +165,11 @@ export class GameScene extends PIXI.Container {
     try {
       this.gameUI = new GameUI(this.stateManager);
 
+      // Set the slot machine reference for instant play functionality
+      if (this.slotMachine) {
+        this.gameUI.setSlotMachine(this.slotMachine);
+      }
+
       // Position the UI in the center of the UI area
       this.gameUI.x = this.GAME_AREA_WIDTH / 2;
       this.gameUI.y = this.UI_HEIGHT / 2;

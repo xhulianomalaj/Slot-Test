@@ -10,9 +10,17 @@ export class PaylineDrawing {
   private paylineGraphics: Map<number, PIXI.Graphics[]> = new Map(); // Array to store both glow and main graphics
   private animationTweens: Map<number, gsap.core.Tween> = new Map();
   private container: PIXI.Container;
+  private animationSpeed: number = 1.0; // Animation speed multiplier
 
   constructor(container: PIXI.Container) {
     this.container = container;
+  }
+
+  /**
+   * Set animation speed multiplier (used for instant play mode)
+   */
+  public setAnimationSpeed(speed: number): void {
+    this.animationSpeed = Math.max(0.1, Math.min(5, speed));
   }
 
   /**
@@ -21,10 +29,10 @@ export class PaylineDrawing {
    */
   public calculateAnimationDuration(positions: Position[]): number {
     const totalSegments = positions.length - 1;
-    const segmentDuration = 0.15; // Reduced from 0.3 to 0.15 for faster drawing
-    const pulsingDuration = 0.4; // Duration of each pulse (in seconds)
+    const segmentDuration = 0.15 / this.animationSpeed; // Apply speed multiplier
+    const pulsingDuration = 0.4 / this.animationSpeed; // Apply speed multiplier
     const pulsingRepeats = 2; // Number of repeats
-    const pulsingRepeatDelay = 0.1; // Delay between repeats (in seconds)
+    const pulsingRepeatDelay = 0.1 / this.animationSpeed; // Apply speed multiplier
 
     const drawingTime = totalSegments * segmentDuration;
     const pulsingTime =
@@ -89,18 +97,18 @@ export class PaylineDrawing {
 
       let currentSegment = 0;
       const totalSegments = positions.length - 1;
-      const segmentDuration = 0.15; // Reduced from 0.3 to 0.15 for faster drawing
+      const segmentDuration = 0.15 / this.animationSpeed; // Apply speed multiplier
 
       const drawNextSegment = () => {
         if (currentSegment >= totalSegments) {
           // Animation complete - add pulsing effect
           const tween = gsap.to([glowGraphics, graphics], {
             alpha: 1.0,
-            duration: 0.4, // Increased from 0.2 to 0.4
+            duration: 0.4 / this.animationSpeed, // Apply speed multiplier
             ease: "power2.out",
             repeat: 2, // Increased from 1 to 2
             yoyo: true,
-            repeatDelay: 0.1, // Increased from 0.05 to 0.1
+            repeatDelay: 0.1 / this.animationSpeed, // Apply speed multiplier
             onComplete: () => {
               // Add null checks before setting properties
               if (
@@ -266,11 +274,11 @@ export class PaylineDrawing {
       graphics.alpha = 0;
       const tween = gsap.to([glowGraphics, graphics], {
         alpha: 0.8,
-        duration: 0.25,
+        duration: 0.25 / this.animationSpeed, // Apply speed multiplier
         ease: "power2.out",
         repeat: -1,
         yoyo: true,
-        repeatDelay: 0.1,
+        repeatDelay: 0.1 / this.animationSpeed, // Apply speed multiplier
       });
       this.animationTweens.set(paylineConfig.id, tween);
     }

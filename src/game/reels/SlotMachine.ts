@@ -24,6 +24,7 @@ export class SlotMachine extends PIXI.Container {
   private _stateManager: GameStateManager | null = null;
   private _renderer: SlotMachineRenderer;
   private _animations: SlotMachineAnimations;
+  private _instantPlayMode: boolean = false;
 
   constructor(symbolFactory: SymbolFactory, stateManager?: GameStateManager) {
     super();
@@ -57,6 +58,21 @@ export class SlotMachine extends PIXI.Container {
     return this._isSpinning;
   }
 
+  get instantPlayMode(): boolean {
+    return this._instantPlayMode;
+  }
+
+  set instantPlayMode(enabled: boolean) {
+    this._instantPlayMode = enabled;
+
+    // Set payline animation speed based on instant play mode
+    if (enabled) {
+      this._paylineRenderer.setAnimationSpeed(3.0); // 3x faster for instant play
+    } else {
+      this._paylineRenderer.setAnimationSpeed(1.0); // Normal speed
+    }
+  }
+
   get paylineRenderer(): PaylineRendererV5 {
     return this._paylineRenderer;
   }
@@ -84,6 +100,13 @@ export class SlotMachine extends PIXI.Container {
     onSkipped?: () => void;
   }): void {
     this._animations.setAnimationCallbacks(callbacks);
+  }
+
+  /**
+   * Set payline animation speed (useful for instant play mode)
+   */
+  setPaylineAnimationSpeed(speed: number): void {
+    this._paylineRenderer.setAnimationSpeed(speed);
   }
 
   /**
@@ -148,6 +171,11 @@ export class SlotMachine extends PIXI.Container {
       throw new Error("Reels are already spinning");
     }
 
+    // Use instant play logic if enabled
+    if (this._instantPlayMode) {
+      return this.instantSpin();
+    }
+
     this._isSpinning = true;
 
     // Disable symbol logging during spin
@@ -172,6 +200,42 @@ export class SlotMachine extends PIXI.Container {
 
       // Log the final visible symbols after animation completes
       // this.logCurrentVisibleSymbols();
+
+      return spinResult;
+    } finally {
+      this._isSpinning = false;
+    }
+  }
+
+  /**
+   * Instant play spin - quick animation with simultaneous stop
+   */
+  private async instantSpin(): Promise<SpinResult> {
+    this._isSpinning = true;
+
+    // Disable symbol logging during spin
+    disableSymbolLogging();
+
+    try {
+      // Start all reels spinning simultaneously with instant animation
+      const spinPromises = this._reels.map((reel) => reel.instantSpin());
+      await Promise.all(spinPromises);
+
+      // Wait for a very short duration (quick spin)
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Stop all reels simultaneously (no staggered timing)
+      const stopPromises = this._reels.map((reel) => reel.stop());
+      await Promise.all(stopPromises);
+
+      // Get the actual visible symbols from the reels after stopping
+      const actualVisibleSymbols = this.getCurrentSymbolGrid();
+
+      // Create spin result with win evaluation using actual visible symbols
+      const spinResult = WinEvaluator.createSpinResult(actualVisibleSymbols);
+
+      // Re-enable symbol logging after animations complete
+      enableSymbolLogging();
 
       return spinResult;
     } finally {

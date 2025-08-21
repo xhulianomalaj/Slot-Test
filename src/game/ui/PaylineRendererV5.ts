@@ -221,6 +221,7 @@ export class PaylineRendererV5 extends PIXI.Container {
    */
   setAnimationSpeed(speed: number): void {
     this.stateManager.setAnimationSpeed(speed);
+    this.drawing.setAnimationSpeed(speed); // Pass speed to drawing class
   }
 
   /**

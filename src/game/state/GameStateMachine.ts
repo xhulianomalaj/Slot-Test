@@ -25,7 +25,7 @@ export type GameEvent =
 // Initial context
 const initialContext: GameContext = {
   balance: 1000,
-  currentBet: 25,
+  currentBet: 10,
   lastWin: 0,
   totalWin: 0,
   reelResults: null,

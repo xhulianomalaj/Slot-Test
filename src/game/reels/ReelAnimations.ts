@@ -58,12 +58,44 @@ export class ReelAnimations {
           // Start symbol changing after acceleration
           this._symbolChangeActive = true;
           this.startFastSpinLoop();
-          
+
           // Stop symbol changing before animation ends (after 1 second)
           setTimeout(() => {
             this._symbolChangeActive = false;
           }, 1000);
-          
+
+          resolve();
+        },
+      });
+    });
+  }
+
+  /**
+   * Instant spin animation - very short duration for instant play mode
+   */
+  async instantSpin(): Promise<void> {
+    if (this._isSpinning) {
+      return;
+    }
+
+    this._isSpinning = true;
+
+    return new Promise<void>((resolve) => {
+      // Accelerate to fast spinning speed much quicker
+      gsap.to(this, {
+        _spinSpeed: 45, // Even faster for instant effect
+        duration: 0.1,
+        ease: "power2.out",
+        onComplete: () => {
+          // Start symbol changing after acceleration
+          this._symbolChangeActive = true;
+          this.startFastSpinLoop();
+
+          // Stop symbol changing very quickly (after 150ms)
+          setTimeout(() => {
+            this._symbolChangeActive = false;
+          }, 150);
+
           resolve();
         },
       });
@@ -75,7 +107,7 @@ export class ReelAnimations {
    */
   private startFastSpinLoop(): void {
     let frameCounter = 0;
-    
+
     const spinLoop = () => {
       if (!this._isSpinning) {
         return;
@@ -87,7 +119,8 @@ export class ReelAnimations {
       // Change symbols only during the active period and at intervals
       if (this._symbolChangeActive) {
         frameCounter++;
-        if (frameCounter >= 4) { // Change symbols every 4 frames
+        if (frameCounter >= 4) {
+          // Change symbols every 4 frames
           this.shuffleRandomSymbols();
           frameCounter = 0;
         }
@@ -110,24 +143,24 @@ export class ReelAnimations {
   private shuffleRandomSymbols(): void {
     // Only change 2-3 symbols at a time for subtle effect
     const symbolsToChange = Math.floor(Math.random() * 3) + 2; // 2-4 symbols
-    
+
     for (let i = 0; i < symbolsToChange; i++) {
       const randomIndex = Math.floor(Math.random() * this._symbols.length);
       const currentSymbol = this._symbols[randomIndex];
-      
+
       if (currentSymbol && !currentSymbol.destroyed) {
         const newSymbolType = generateSymbol();
         const newSymbol = this._symbolFactory.createSymbol(newSymbolType);
-        
+
         // Copy position exactly
         newSymbol.x = currentSymbol.x;
         newSymbol.y = currentSymbol.y;
-        
+
         // Replace the symbol
         this._removeChildCallback(currentSymbol);
         currentSymbol.destroy();
         this._addChildCallback(newSymbol);
-        
+
         // Update array
         this._symbols[randomIndex] = newSymbol;
       }
@@ -144,14 +177,14 @@ export class ReelAnimations {
 
     // Stop symbol changing immediately when stopping
     this._symbolChangeActive = false;
-    
+
     // Stop immediately
     this._isSpinning = false;
     this._spinSpeed = 0;
-    
+
     // Snap to nearest symbol boundary for proper alignment
     this.snapToSymbolPosition();
-    
+
     return Promise.resolve();
   }
 
@@ -161,17 +194,17 @@ export class ReelAnimations {
   private snapToSymbolPosition(): void {
     // Calculate the remainder when dividing current position by symbol height
     const remainder = this._reelContainer.y % this._symbolHeight;
-    
+
     // Snap to the nearest symbol boundary
     let targetY;
     if (remainder < this._symbolHeight / 2) {
       // Snap to the previous symbol boundary
       targetY = this._reelContainer.y - remainder;
     } else {
-      // Snap to the next symbol boundary  
+      // Snap to the next symbol boundary
       targetY = this._reelContainer.y + (this._symbolHeight - remainder);
     }
-    
+
     // Apply the snap immediately (no animation)
     this._reelContainer.y = targetY;
   }

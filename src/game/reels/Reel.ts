@@ -224,6 +224,13 @@ export class Reel extends PIXI.Container {
   }
 
   /**
+   * Start instant spinning animation (for instant play mode)
+   */
+  async instantSpin(): Promise<void> {
+    return this._animations.instantSpin();
+  }
+
+  /**
    * Stop spinning naturally
    */
   async stop(): Promise<void> {
