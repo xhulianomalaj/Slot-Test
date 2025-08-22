@@ -15,7 +15,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 1.0,
       5: 2.5,
     },
-    imagePath: "/assets/images/symbols/New Assets/Apple.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Apple.png",
   },
   {
     type: SymbolType.BLUEBERRY,
@@ -26,7 +26,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 1.5,
       5: 3.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/BlueBerry.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/BlueBerry.png",
   },
   {
     type: SymbolType.CHERRY,
@@ -37,7 +37,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 2.0,
       5: 4.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Cherry.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Cherry.png",
   },
   {
     type: SymbolType.COCONUT,
@@ -48,7 +48,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 2.5,
       5: 5.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Coconut.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Coconut.png",
   },
   {
     type: SymbolType.KIWI,
@@ -59,7 +59,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 3.0,
       5: 6.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Kiwi.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Kiwi.png",
   },
   {
     type: SymbolType.ORANGE,
@@ -70,7 +70,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 4.0,
       5: 8.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Orange.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Orange.png",
   },
   {
     type: SymbolType.PEAR,
@@ -81,7 +81,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 5.0,
       5: 10.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Pear.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Pear.png",
   },
   {
     type: SymbolType.STRAWBERRY,
@@ -92,7 +92,7 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
       4: 6.0,
       5: 12.0,
     },
-    imagePath: "/assets/images/symbols/New Assets/Strawberry.png",
+    imagePath: "/assets/images/symbols/Fruit Assets/Strawberry.png",
   },
 ];
 

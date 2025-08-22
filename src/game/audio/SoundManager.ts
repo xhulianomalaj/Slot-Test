@@ -7,6 +7,7 @@ export class SoundManager {
   private static _instance: SoundManager;
   private _soundsLoaded: boolean = false;
   private _isMuted: boolean = false;
+  private _soundEffectsMuted: boolean = false;
   private _volume: number = 1.0;
 
   // Sound effect instances
@@ -43,7 +44,10 @@ export class SoundManager {
       await sound.add(this._winSound, "assets/sounds/effects/win.mp3");
 
       // Load the spinning sound effect
-      await sound.add(this._spinningSound, "assets/sounds/effects/spinning.wav");
+      await sound.add(
+        this._spinningSound,
+        "assets/sounds/effects/spinning.wav"
+      );
 
       // Load the background music
       await sound.add(
@@ -52,7 +56,6 @@ export class SoundManager {
       );
 
       this._soundsLoaded = true;
-      console.log("SoundManager: All sounds loaded successfully");
 
       // Start background music after loading
       this.startBackgroundMusic();
@@ -66,7 +69,7 @@ export class SoundManager {
    * Play the win sound effect
    */
   public playWinSound(): void {
-    if (!this._soundsLoaded || this._isMuted) {
+    if (!this._soundsLoaded || this._soundEffectsMuted) {
       return;
     }
 
@@ -93,7 +96,7 @@ export class SoundManager {
 
       // Start playing background music in a loop
       this._backgroundMusicInstance = sound.play(this._backgroundMusic, {
-        volume: this._volume * 1.5, // Background music should be quieter
+        volume: this._volume * 2, // Background music should be quieter
         loop: true,
       });
     } catch (error) {
@@ -107,7 +110,8 @@ export class SoundManager {
   public stopBackgroundMusic(): void {
     if (this._backgroundMusicInstance) {
       try {
-        this._backgroundMusicInstance.stop();
+        // Use the sound library to stop by alias name
+        sound.stop(this._backgroundMusic);
         this._backgroundMusicInstance = null;
       } catch (error) {
         console.error("SoundManager: Failed to stop background music:", error);
@@ -119,19 +123,19 @@ export class SoundManager {
    * Start spinning sound for all reels (both instant and normal play modes)
    */
   public startSpinningSound(): any {
-    if (!this._soundsLoaded || this._isMuted) {
+    if (!this._soundsLoaded || this._soundEffectsMuted) {
       return null;
     }
 
     try {
       // First stop any existing spinning sounds to avoid overlap
       this.stopAllSpinningSounds();
-      
+
       const spinningInstance = sound.play(this._spinningSound, {
-        volume: this._volume * 0.4, // Spinning sound at moderate volume
+        volume: this._volume * 0.2, // Spinning sound at moderate volume
         loop: true,
       });
-      
+
       if (spinningInstance) {
         this._spinningInstances.push(spinningInstance);
       }
@@ -149,7 +153,7 @@ export class SoundManager {
     try {
       // Stop all instances of the spinning sound by name (most reliable method)
       sound.stop(this._spinningSound);
-      
+
       // Clear our tracking array
       this._spinningInstances = [];
     } catch (error) {
@@ -164,7 +168,7 @@ export class SoundManager {
     try {
       // Stop all instances of the spinning sound by name (most reliable method)
       sound.stop(this._spinningSound);
-      
+
       // Clear our tracking array
       this._spinningInstances = [];
     } catch (error) {
@@ -182,10 +186,15 @@ export class SoundManager {
     // Update the global volume for all sounds
     sound.volumeAll = this._volume;
 
-    // Update background music volume if it's playing
+    // Restart background music with new volume if it's currently playing
     if (this._backgroundMusicInstance) {
       try {
-        this._backgroundMusicInstance.volume = this._volume * 1.5;
+        // Stop current instance and restart with new volume
+        sound.stop(this._backgroundMusic);
+        this._backgroundMusicInstance = sound.play(this._backgroundMusic, {
+          volume: this._volume * 2,
+          loop: true,
+        });
       } catch (error) {
         console.error(
           "SoundManager: Failed to update background music volume:",
@@ -224,6 +233,20 @@ export class SoundManager {
    */
   public isMuted(): boolean {
     return this._isMuted;
+  }
+
+  /**
+   * Mute or unmute sound effects only (win sounds, spinning sounds)
+   */
+  public setSoundEffectsMuted(muted: boolean): void {
+    this._soundEffectsMuted = muted;
+  }
+
+  /**
+   * Check if sound effects are currently muted
+   */
+  public isSoundEffectsMuted(): boolean {
+    return this._soundEffectsMuted;
   }
 
   /**

@@ -5,6 +5,7 @@ import { GameStateManager } from "../state/GameStateManager";
 import { GameUI } from "../../components/ui/GameUI";
 import { WinEvaluator } from "../logic/WinEvaluatorV5";
 import { setGenerationMode } from "../symbols/SymbolConfig";
+import { AudioControls } from "../ui/AudioControls";
 import type { SpinResult } from "../../types";
 
 export class GameScene extends PIXI.Container {
@@ -15,6 +16,7 @@ export class GameScene extends PIXI.Container {
   private slotMachine: SlotMachine | null = null;
   private stateManager: GameStateManager;
   private gameUI: GameUI | null = null;
+  private audioControls: AudioControls | null = null;
   private keyboardHandler: ((event: KeyboardEvent) => void) | null = null;
 
   // Layout constants
@@ -48,6 +50,9 @@ export class GameScene extends PIXI.Container {
 
     // Initialize game UI
     this.initializeGameUI();
+
+    // Initialize audio controls
+    this.initializeAudioControls();
 
     // Setup keyboard controls
     this.setupKeyboardControls();
@@ -181,6 +186,17 @@ export class GameScene extends PIXI.Container {
       this.setupStateToSlotMachineConnection();
     } catch (error) {
       console.error("Failed to initialize game UI:", error);
+    }
+  }
+
+  private initializeAudioControls(): void {
+    try {
+      this.audioControls = new AudioControls();
+
+      // Add audio controls to the main scene (top level)
+      this.addChild(this.audioControls);
+    } catch (error) {
+      console.error("Failed to initialize audio controls:", error);
     }
   }
 
@@ -391,6 +407,11 @@ export class GameScene extends PIXI.Container {
     // Clean up UI
     if (this.gameUI) {
       this.gameUI.destroy();
+    }
+
+    // Clean up audio controls
+    if (this.audioControls) {
+      this.audioControls.destroy();
     }
 
     super.destroy();

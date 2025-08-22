@@ -80,9 +80,11 @@ export class GameApplication {
     try {
       const soundManager = SoundManager.getInstance();
       await soundManager.initialize();
-      console.log('SoundManager initialized successfully');
     } catch (error) {
-      console.warn('Failed to initialize SoundManager, continuing without sound:', error);
+      console.warn(
+        "Failed to initialize SoundManager, continuing without sound:",
+        error
+      );
       // Don't throw the error - the game should continue without sound if needed
     }
   }
@@ -96,11 +98,11 @@ export class GameApplication {
 
   public destroy(): void {
     window.removeEventListener("resize", this.resize);
-    
+
     // Cleanup sound manager
     const soundManager = SoundManager.getInstance();
     soundManager.destroy();
-    
+
     this.app.destroy(true, { children: true, texture: true });
   }
 }
