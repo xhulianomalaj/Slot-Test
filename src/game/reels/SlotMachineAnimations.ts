@@ -2,6 +2,7 @@ import type { SpinResult, WinResult } from "../../types";
 import { WinEvaluator } from "../logic/WinEvaluatorV5";
 import { PaylineRendererV5 } from "../ui/PaylineRendererV5";
 import { Reel } from "./Reel";
+import { SoundManager } from "../audio/SoundManager";
 
 /**
  * Handles all animation and celebration aspects of the slot machine
@@ -80,6 +81,12 @@ export class SlotMachineAnimations {
   async celebrateWin(spinResult: SpinResult): Promise<void> {
     if (!WinEvaluator.hasWins(spinResult)) {
       return;
+    }
+
+    // Play win sound effect
+    const soundManager = SoundManager.getInstance();
+    if (soundManager.isReady()) {
+      soundManager.playWinSound();
     }
 
     // Highlight winning symbols

@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js";
 import { GameScene } from "./GameScene.js";
+import { SoundManager } from "../audio/SoundManager";
 
 export class GameApplication {
   public app: PIXI.Application;
@@ -31,6 +32,9 @@ export class GameApplication {
 
       // Initialize asset loading pipeline
       await this.loadAssets();
+
+      // Initialize sound manager
+      await this.initializeSoundManager();
 
       // Add game scene to stage
       this.app.stage.addChild(this.gameScene);
@@ -72,6 +76,17 @@ export class GameApplication {
     }
   }
 
+  private async initializeSoundManager(): Promise<void> {
+    try {
+      const soundManager = SoundManager.getInstance();
+      await soundManager.initialize();
+      console.log('SoundManager initialized successfully');
+    } catch (error) {
+      console.warn('Failed to initialize SoundManager, continuing without sound:', error);
+      // Don't throw the error - the game should continue without sound if needed
+    }
+  }
+
   public resize(): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -81,6 +96,11 @@ export class GameApplication {
 
   public destroy(): void {
     window.removeEventListener("resize", this.resize);
+    
+    // Cleanup sound manager
+    const soundManager = SoundManager.getInstance();
+    soundManager.destroy();
+    
     this.app.destroy(true, { children: true, texture: true });
   }
 }

@@ -13,6 +13,7 @@ import { WinEvaluator } from "../logic/WinEvaluatorV5";
 import { PaylineRendererV5 } from "../ui/PaylineRendererV5";
 import { SlotMachineRenderer } from "./SlotMachineRenderer";
 import { SlotMachineAnimations } from "./SlotMachineAnimations";
+import { SoundManager } from "../audio/SoundManager";
 
 export class SlotMachine extends PIXI.Container {
   private _reels: Reel[] = [];
@@ -25,6 +26,7 @@ export class SlotMachine extends PIXI.Container {
   private _renderer: SlotMachineRenderer;
   private _animations: SlotMachineAnimations;
   private _instantPlayMode: boolean = false;
+  private _spinningSound: any = null;
 
   constructor(symbolFactory: SymbolFactory, stateManager?: GameStateManager) {
     super();
@@ -181,6 +183,12 @@ export class SlotMachine extends PIXI.Container {
     // Disable symbol logging during spin
     disableSymbolLogging();
 
+    // Start single spinning sound for normal play
+    const soundManager = SoundManager.getInstance();
+    if (soundManager.isReady()) {
+      this._spinningSound = soundManager.startSpinningSound();
+    }
+
     try {
       // Start all reels spinning simultaneously
       const spinPromises = this._reels.map((reel) => reel.spin());
@@ -211,6 +219,13 @@ export class SlotMachine extends PIXI.Container {
       return spinResult;
     } finally {
       this._isSpinning = false;
+
+      // Ensure spinning sound is stopped even if there was an error
+      const soundManager = SoundManager.getInstance();
+      if (this._spinningSound && soundManager.isReady()) {
+        soundManager.stopSpinningSound();
+        this._spinningSound = null;
+      }
     }
   }
 
@@ -223,13 +238,19 @@ export class SlotMachine extends PIXI.Container {
     // Disable symbol logging during spin
     disableSymbolLogging();
 
+    // Start single spinning sound for instant play
+    const soundManager = SoundManager.getInstance();
+    if (soundManager.isReady()) {
+      this._spinningSound = soundManager.startSpinningSound();
+    }
+
     try {
       // Start all reels spinning simultaneously with instant animation
       const spinPromises = this._reels.map((reel) => reel.instantSpin());
       await Promise.all(spinPromises);
 
-      // Wait for a very short duration (quick spin)
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      // Wait for a short duration
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       // Stop all reels simultaneously (no staggered timing)
       const stopPromises = this._reels.map((reel) => reel.stop());
@@ -254,6 +275,13 @@ export class SlotMachine extends PIXI.Container {
       return spinResult;
     } finally {
       this._isSpinning = false;
+
+      // Ensure spinning sound is stopped even if there was an error
+      const soundManager = SoundManager.getInstance();
+      if (this._spinningSound && soundManager.isReady()) {
+        soundManager.stopSpinningSound();
+        this._spinningSound = null;
+      }
     }
   }
 
@@ -310,6 +338,13 @@ export class SlotMachine extends PIXI.Container {
   forceStop(): void {
     this._animations.forceStopAllReels();
     this._isSpinning = false;
+
+    // Stop spinning sound immediately
+    const soundManager = SoundManager.getInstance();
+    if (soundManager.isReady() && this._spinningSound) {
+      soundManager.stopSpinningSound();
+      this._spinningSound = null;
+    }
   }
 
   /**
