@@ -14,6 +14,7 @@ export class SoundManager {
   private _winSound: string = "win-sound";
   private _backgroundMusic: string = "background-music";
   private _spinningSound: string = "spinning-sound";
+  private _buttonPressSound: string = "button-press-sound";
   private _backgroundMusicInstance: any = null;
   private _spinningInstances: any[] = [];
 
@@ -49,6 +50,12 @@ export class SoundManager {
         "assets/sounds/effects/spinning.wav"
       );
 
+      // Load the button press sound effect
+      await sound.add(
+        this._buttonPressSound,
+        "assets/sounds/effects/button-press.mp3"
+      );
+
       // Load the background music
       await sound.add(
         this._backgroundMusic,
@@ -79,6 +86,23 @@ export class SoundManager {
       });
     } catch (error) {
       console.error("SoundManager: Failed to play win sound:", error);
+    }
+  }
+
+  /**
+   * Play the button press sound effect
+   */
+  public playButtonPressSound(): void {
+    if (!this._soundsLoaded || this._soundEffectsMuted) {
+      return;
+    }
+
+    try {
+      sound.play(this._buttonPressSound, {
+        volume: this._volume * 1,
+      });
+    } catch (error) {
+      console.error("SoundManager: Failed to play button press sound:", error);
     }
   }
 

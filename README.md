@@ -36,7 +36,6 @@ pnpm build
 
 ## Key Features
 
-- Responsive design that works on desktop and mobile
 - Audio controls for music and sound effects
 - Comprehensive info panel with rules and payline patterns
 - Real-time win detection and payout calculations

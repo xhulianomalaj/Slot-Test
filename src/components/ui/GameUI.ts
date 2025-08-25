@@ -5,6 +5,7 @@ import { InputField } from "./InputField";
 import { ToggleButton } from "./ToggleButton";
 import { GameStateManager, type GameContext } from "../../game/state";
 import type { SlotMachine } from "../../game/reels/SlotMachine";
+import { SoundManager } from "../../game/audio/SoundManager";
 
 export class GameUI extends PIXI.Container {
   private stateManager: GameStateManager;
@@ -216,18 +217,24 @@ export class GameUI extends PIXI.Container {
     // Spin button
     this.spinButton.onClick(() => {
       if (this.stateManager.canSpin) {
-        this.stateManager.spin();
+        SoundManager.getInstance().playButtonPressSound();
+        // Small delay to let button press sound play before spinning sound
+        setTimeout(() => {
+          this.stateManager.spin();
+        }, 250);
       }
     });
 
     // Bet control buttons
     this.increaseBetButton.onClick(() => {
+      SoundManager.getInstance().playButtonPressSound();
       this.stateManager.increaseBet();
       // Update the input field to reflect the new bet value
       this.betInput.value = this.stateManager.context.currentBet.toString();
     });
 
     this.decreaseBetButton.onClick(() => {
+      SoundManager.getInstance().playButtonPressSound();
       this.stateManager.decreaseBet();
       // Update the input field to reflect the new bet value
       this.betInput.value = this.stateManager.context.currentBet.toString();
@@ -258,6 +265,7 @@ export class GameUI extends PIXI.Container {
 
     // Instant Play toggle
     this.instantPlayToggle.onClick((isToggled: boolean) => {
+      SoundManager.getInstance().playButtonPressSound();
       if (this.slotMachine) {
         this.slotMachine.instantPlayMode = isToggled;
       } else {
@@ -442,6 +450,13 @@ export class GameUI extends PIXI.Container {
       width: this.UI_WIDTH,
       height: this.UI_HEIGHT,
     };
+  }
+
+  /**
+   * Simulate spin button press effect for keyboard triggers
+   */
+  public simulateSpinButtonPress(): void {
+    this.spinButton.simulatePress();
   }
 
   // Cleanup

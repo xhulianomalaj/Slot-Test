@@ -6,6 +6,7 @@ import { GameUI } from "../../components/ui/GameUI";
 import { WinEvaluator } from "../logic/WinEvaluatorV5";
 import { setGenerationMode } from "../symbols/SymbolConfig";
 import { AudioControls } from "../ui/AudioControls";
+import { SoundManager } from "../audio/SoundManager";
 import type { SpinResult } from "../../types";
 
 export class GameScene extends PIXI.Container {
@@ -375,7 +376,13 @@ export class GameScene extends PIXI.Container {
             this.stateManager.canSpin &&
             this.stateManager.currentState === "idle"
           ) {
-            this.stateManager.spin();
+            // Trigger visual button press effect
+            this.gameUI.simulateSpinButtonPress();
+            SoundManager.getInstance().playButtonPressSound();
+            // Add delay to match GameUI button timing
+            setTimeout(() => {
+              this.stateManager.spin();
+            }, 250);
           }
           break;
       }

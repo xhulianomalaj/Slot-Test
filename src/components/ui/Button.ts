@@ -252,6 +252,37 @@ export class Button extends PIXI.Container {
     this.updateVisuals();
   }
 
+  /**
+   * Simulate a button press effect for keyboard triggers
+   */
+  simulatePress(): void {
+    if (!this._enabled) return;
+
+    // Temporarily set pressed state for visual effect
+    this._isPressed = true;
+    this.updateVisuals();
+
+    // Scale down animation
+    gsap.to(this.scale, {
+      x: 0.95,
+      y: 0.95,
+      duration: 0.1,
+      ease: "power2.out",
+      onComplete: () => {
+        // Reset pressed state and scale back up
+        this._isPressed = false;
+        this.updateVisuals();
+        
+        gsap.to(this.scale, {
+          x: 1,
+          y: 1,
+          duration: 0.1,
+          ease: "power2.out",
+        });
+      }
+    });
+  }
+
   // Cleanup
   override destroy(): void {
     this.removeAllListeners();
