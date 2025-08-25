@@ -35,20 +35,17 @@ export class InputField extends PIXI.Container {
       borderWidth = 1,
     } = options;
 
-    // Store dimensions and colors for later use
     this._width = width;
     this._height = height;
     this._backgroundColor = backgroundColor;
     this._borderColor = borderColor;
 
-    // Create background
     this.background = new PIXI.Graphics();
     this.background.rect(0, 0, width, height);
     this.background.fill(backgroundColor);
     this.background.stroke({ color: borderColor, width: borderWidth });
     this.addChild(this.background);
 
-    // Create text field
     this.textField = new PIXI.Text({
       text: initialValue,
       style: {
@@ -79,7 +76,6 @@ export class InputField extends PIXI.Container {
       this.focus();
     });
 
-    // Handle keyboard input when focused
     if (globalThis.document) {
       globalThis.document.addEventListener("keydown", (event) => {
         if (!this._isActive) return;
@@ -94,7 +90,6 @@ export class InputField extends PIXI.Container {
           this.updateDisplay();
           this.onChangeCallback?.(this._value);
         } else if (event.key.match(/[0-9]/)) {
-          // Only allow numbers and limit to 11 characters
           if (this._value.length < 10) {
             this._value += event.key;
             this.updateDisplay();
@@ -124,23 +119,22 @@ export class InputField extends PIXI.Container {
     this._isActive = true;
     this.background.clear();
     this.background.rect(0, 0, this._width, this._height);
-    this.background.fill(0x2c3e50); // Darker when active
-    this.background.stroke({ color: 0x3498db, width: 2 }); // Blue border when active
+    this.background.fill(0x2c3e50);
+    this.background.stroke({ color: 0x3498db, width: 2 });
   }
 
   private blur(): void {
     this._isActive = false;
     this.background.clear();
     this.background.rect(0, 0, this._width, this._height);
-    this.background.fill(this._backgroundColor); // Original color
-    this.background.stroke({ color: this._borderColor, width: 1 }); // Original border
+    this.background.fill(this._backgroundColor);
+    this.background.stroke({ color: this._borderColor, width: 1 });
   }
 
   private updateDisplay(): void {
     this.textField.text = this._value;
   }
 
-  // Public methods
   get value(): string {
     return this._value;
   }

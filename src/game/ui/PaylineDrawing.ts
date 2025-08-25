@@ -3,36 +3,26 @@ import { GAME_CONFIG, LAYOUT } from "../config/GameConfig";
 import type { WinResult, PaylineConfig, Position } from "../../types";
 import gsap from "gsap";
 
-/**
- * Handles the actual drawing and rendering of paylines
- */
 export class PaylineDrawing {
-  private paylineGraphics: Map<number, PIXI.Graphics[]> = new Map(); // Array to store both glow and main graphics
+  private paylineGraphics: Map<number, PIXI.Graphics[]> = new Map();
   private animationTweens: Map<number, gsap.core.Tween> = new Map();
   private container: PIXI.Container;
-  private animationSpeed: number = 1.0; // Animation speed multiplier
+  private animationSpeed: number = 1.0;
 
   constructor(container: PIXI.Container) {
     this.container = container;
   }
 
-  /**
-   * Set animation speed multiplier (used for instant play mode)
-   */
   public setAnimationSpeed(speed: number): void {
     this.animationSpeed = Math.max(0.1, Math.min(5, speed));
   }
 
-  /**
-   * Calculate the total animation duration for a payline in milliseconds
-   * This should match the actual timing used in animateLineDrawing
-   */
   public calculateAnimationDuration(positions: Position[]): number {
     const totalSegments = positions.length - 1;
-    const segmentDuration = 0.15 / this.animationSpeed; // Apply speed multiplier
-    const pulsingDuration = 0.4 / this.animationSpeed; // Apply speed multiplier
-    const pulsingRepeats = 2; // Number of repeats
-    const pulsingRepeatDelay = 0.1 / this.animationSpeed; // Apply speed multiplier
+    const segmentDuration = 0.15 / this.animationSpeed;
+    const pulsingDuration = 0.4 / this.animationSpeed;
+    const pulsingRepeats = 2;
+    const pulsingRepeatDelay = 0.1 / this.animationSpeed;
 
     const drawingTime = totalSegments * segmentDuration;
     const pulsingTime =
@@ -43,9 +33,6 @@ export class PaylineDrawing {
     return (drawingTime + pulsingTime) * 1000;
   }
 
-  /**
-   * Draw a winning payline with optional animation
-   */
   async drawWinningPayline(
     win: WinResult,
     animate: boolean = false
@@ -53,7 +40,6 @@ export class PaylineDrawing {
     const lineColor = this.getPaylineColor(win.payline);
     const lineWidth = 4;
 
-    // Calculate symbol positions based on WINNING positions only
     const positions = win.positions.map((pos) =>
       this.getSymbolScreenPosition(pos)
     );
@@ -76,9 +62,6 @@ export class PaylineDrawing {
     }
   }
 
-  /**
-   * Animate the line being drawn from start to finish
-   */
   private async animateLineDrawing(
     paylineId: number,
     positions: { x: number; y: number }[],
@@ -92,25 +75,23 @@ export class PaylineDrawing {
       this.container.addChild(glowGraphics);
       this.container.addChild(graphics);
 
-      // Store graphics for cleanup
       this.paylineGraphics.set(paylineId, [glowGraphics, graphics]);
 
       let currentSegment = 0;
       const totalSegments = positions.length - 1;
-      const segmentDuration = 0.15 / this.animationSpeed; // Apply speed multiplier
+      const segmentDuration = 0.15 / this.animationSpeed;
 
       const drawNextSegment = () => {
         if (currentSegment >= totalSegments) {
           // Animation complete - add pulsing effect
           const tween = gsap.to([glowGraphics, graphics], {
             alpha: 1.0,
-            duration: 0.4 / this.animationSpeed, // Apply speed multiplier
+            duration: 0.4 / this.animationSpeed,
             ease: "power2.out",
-            repeat: 2, // Increased from 1 to 2
+            repeat: 2,
             yoyo: true,
-            repeatDelay: 0.1 / this.animationSpeed, // Apply speed multiplier
+            repeatDelay: 0.1 / this.animationSpeed,
             onComplete: () => {
-              // Add null checks before setting properties
               if (
                 glowGraphics &&
                 !glowGraphics.destroyed &&
@@ -138,7 +119,6 @@ export class PaylineDrawing {
           duration: segmentDuration,
           ease: "power2.out",
           onUpdate: () => {
-            // Add null checks to prevent errors during skip
             if (
               !graphics ||
               graphics.destroyed ||
@@ -148,7 +128,6 @@ export class PaylineDrawing {
               return;
             }
 
-            // Clear and redraw up to current progress
             graphics.clear();
             glowGraphics.clear();
 
@@ -175,7 +154,6 @@ export class PaylineDrawing {
             graphics.lineTo(currentX, currentY);
             glowGraphics.lineTo(currentX, currentY);
 
-            // Apply styles
             graphics.stroke({ color: lineColor, width: lineWidth, alpha: 0.9 });
             glowGraphics.stroke({
               color: lineColor,
@@ -190,14 +168,10 @@ export class PaylineDrawing {
         });
       };
 
-      // Start drawing
       drawNextSegment();
     });
   }
 
-  /**
-   * Draw a static line (for showing all lines at once)
-   */
   private drawStaticLine(
     paylineId: number,
     positions: { x: number; y: number }[],
@@ -222,28 +196,21 @@ export class PaylineDrawing {
     this.container.addChild(glowGraphics);
     this.container.addChild(graphics);
 
-    // Store both graphics for cleanup
     this.paylineGraphics.set(paylineId, [glowGraphics, graphics]);
 
-    // Set initial visibility
     glowGraphics.alpha = 0.3;
     graphics.alpha = 0.6;
   }
 
-  /**
-   * Draw a payline configuration (for showing all paylines)
-   */
   drawPayline(paylineConfig: PaylineConfig, animate: boolean = false): void {
     const lineColor = this.getPaylineColor(paylineConfig.id);
     const lineWidth = 3;
 
-    // Calculate positions from payline configuration
     const positions = paylineConfig.positions.map((position) => {
       return this.getSymbolScreenPosition(position);
     });
 
     if (animate) {
-      // Start with invisible and animate in
       const graphics = new PIXI.Graphics();
       const glowGraphics = new PIXI.Graphics();
 
@@ -266,27 +233,22 @@ export class PaylineDrawing {
       this.container.addChild(glowGraphics);
       this.container.addChild(graphics);
 
-      // Store both graphics for cleanup
       this.paylineGraphics.set(paylineConfig.id, [glowGraphics, graphics]);
 
-      // Start with invisible and animate in
       glowGraphics.alpha = 0;
       graphics.alpha = 0;
       const tween = gsap.to([glowGraphics, graphics], {
         alpha: 0.8,
-        duration: 0.25 / this.animationSpeed, // Apply speed multiplier
+        duration: 0.25 / this.animationSpeed,
         ease: "power2.out",
         repeat: -1,
         yoyo: true,
-        repeatDelay: 0.1 / this.animationSpeed, // Apply speed multiplier
+        repeatDelay: 0.1 / this.animationSpeed,
       });
       this.animationTweens.set(paylineConfig.id, tween);
     }
   }
 
-  /**
-   * Get screen position for a symbol at given reel/row position
-   */
   private getSymbolScreenPosition(position: Position): {
     x: number;
     y: number;
@@ -297,7 +259,6 @@ export class PaylineDrawing {
     const reelCount = GAME_CONFIG.reels.count;
     const rowCount = GAME_CONFIG.reels.rows;
 
-    // Calculate reel starting position (same as SlotMachine layout)
     const totalWidth = symbolWidth * reelCount + reelSpacing * (reelCount - 1);
     const startX = -totalWidth / 2 + symbolWidth / 2;
     const startY = -((rowCount - 1) * symbolHeight) / 2;
@@ -308,48 +269,20 @@ export class PaylineDrawing {
     return { x, y };
   }
 
-  /**
-   * Get color for a specific payline
-   */
   private getPaylineColor(paylineId: number): number {
     const colors = [
-      0xff6b6b, // Red
-      0x4ecdc4, // Teal
-      0x45b7d1, // Blue
-      0x96ceb4, // Green
-      0xfeca57, // Yellow
-      0xff9ff3, // Pink
-      0x54a0ff, // Light Blue
-      0x5f27cd, // Purple
-      0x00d2d3, // Cyan
-      0xff9f43, // Orange
-      0x10ac84, // Dark Green
-      0xee5a24, // Dark Orange
-      0x0984e3, // Royal Blue
-      0x6c5ce7, // Light Purple
-      0xfb8500, // Amber
-      0x007f5f, // Forest Green
-      0x2a9d8f, // Teal Green
-      0xe76f51, // Terracotta
-      0x264653, // Dark Teal
-      0xf4a261, // Sandy Brown
-      0xe9c46a, // Golden Yellow
-      0x2a9134, // Grass Green
-      0x8338ec, // Violet
-      0x3a86ff, // Dodger Blue
-      0xff006e, // Hot Pink
+      0xff6b6b, 0x4ecdc4, 0x45b7d1, 0x96ceb4, 0xfeca57, 0xff9ff3, 0x54a0ff,
+      0x5f27cd, 0x00d2d3, 0xff9f43, 0x10ac84, 0xee5a24, 0x0984e3, 0x6c5ce7,
+      0xfb8500, 0x007f5f, 0x2a9d8f, 0xe76f51, 0x264653, 0xf4a261, 0xe9c46a,
+      0x2a9134, 0x8338ec, 0x3a86ff, 0xff006e,
     ];
 
     return colors[paylineId % colors.length];
   }
 
-  /**
-   * Clear a specific payline
-   */
   clearPayline(paylineId: number): void {
     const graphicsArray = this.paylineGraphics.get(paylineId);
     if (graphicsArray) {
-      // Remove and destroy all graphics
       graphicsArray.forEach((graphics) => {
         this.container.removeChild(graphics);
         graphics.destroy();
@@ -365,9 +298,6 @@ export class PaylineDrawing {
     }
   }
 
-  /**
-   * Clear all paylines
-   */
   clearAllPaylines(): void {
     // Kill all animation tweens first
     this.animationTweens.forEach((tween) => tween.kill());
@@ -383,15 +313,11 @@ export class PaylineDrawing {
     this.paylineGraphics.clear();
   }
 
-  /**
-   * Force cleanup without animation protection
-   */
   forceCleanup(): void {
     // Kill all tweens
     this.animationTweens.forEach((tween) => tween.kill());
     this.animationTweens.clear();
 
-    // Remove and destroy all graphics immediately
     this.paylineGraphics.forEach((graphicsArray) => {
       graphicsArray.forEach((graphics) => {
         this.container.removeChild(graphics);
@@ -401,9 +327,6 @@ export class PaylineDrawing {
     this.paylineGraphics.clear();
   }
 
-  /**
-   * Show all available paylines (for UI/tutorial purposes)
-   */
   showAllPaylines(alpha: number = 0.3): void {
     this.clearAllPaylines();
 
@@ -411,7 +334,6 @@ export class PaylineDrawing {
       this.drawPayline(paylineConfig, false);
     });
 
-    // Set uniform alpha for all paylines
     this.paylineGraphics.forEach((graphicsArray) => {
       graphicsArray.forEach((graphics) => {
         graphics.alpha = alpha;

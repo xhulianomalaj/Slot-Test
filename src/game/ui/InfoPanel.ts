@@ -17,7 +17,6 @@ export class InfoPanel {
   }
 
   private createInfoPanel(): void {
-    // Create overlay
     this.overlay = document.createElement("div");
     this.overlay.className = "info-panel-overlay";
     this.overlay.addEventListener("click", (e) => {
@@ -26,15 +25,9 @@ export class InfoPanel {
       }
     });
 
-    // Create main panel
     this.panel = document.createElement("div");
     this.panel.className = "info-panel";
 
-    // Create panel
-    this.panel = document.createElement("div");
-    this.panel.className = "info-panel";
-
-    // OPERA GX: Force inline styles immediately
     this.panel.style.cssText = `
       background: #ffffff !important;
       background-color: #ffffff !important;
@@ -98,27 +91,22 @@ export class InfoPanel {
       </div>
     `;
 
-    // Add close button event
     const closeButton = this.panel.querySelector(".close-button");
     closeButton?.addEventListener("click", () => this.close());
 
-    // Add to overlay and then to document
     this.overlay.appendChild(this.panel);
     document.body.appendChild(this.overlay);
 
-    // NUCLEAR OPTION: Force Opera GX to comply with our styling
     this.forceOperaGXStyling();
   }
 
   private forceOperaGXStyling(): void {
-    // Multiple attempts to force styling - Opera GX is stubborn
     const attempts = [0, 10, 50, 100, 200, 500];
 
     attempts.forEach((delay) => {
       setTimeout(() => {
         if (!this.panel) return;
 
-        // Method 1: Direct style manipulation
         this.panel.style.cssText = `
           background: #ffffff !important;
           background-color: #ffffff !important;
@@ -134,12 +122,10 @@ export class InfoPanel {
           transform: translateZ(0) !important;
         `;
 
-        // Method 2: Force all children elements
         const allElements = this.panel.querySelectorAll("*");
         allElements.forEach((element: Element) => {
           const htmlElement = element as HTMLElement;
 
-          // Skip elements that should keep their styling
           const isCloseButton = htmlElement.classList.contains("close-button");
           const isTableHeader = htmlElement.closest("thead") !== null;
           const isMultiplier = htmlElement.classList.contains("multiplier");
@@ -153,13 +139,11 @@ export class InfoPanel {
               fill: #000000 !important;
             `;
 
-            // Remove any conflicting attributes
             htmlElement.removeAttribute("data-theme");
             htmlElement.removeAttribute("data-color-scheme");
           }
         });
 
-        // Method 3: Force specific sections
         const content = this.panel.querySelector(
           ".info-panel-content"
         ) as HTMLElement;
@@ -182,14 +166,12 @@ export class InfoPanel {
           `;
         }
 
-        // Method 4: Force overlay styling
         if (this.overlay) {
           this.overlay.style.cssText += `
             background-color: rgba(0, 0, 0, 0.5) !important;
           `;
         }
 
-        // Method 5: Create an invisible white div behind the panel
         const forceBackground = document.createElement("div");
         forceBackground.style.cssText = `
           position: absolute;
@@ -208,7 +190,6 @@ export class InfoPanel {
   }
 
   private generatePayoutRows(): string {
-    // Sort symbols by highest 5-match payout
     const sortedSymbols = [...SYMBOL_CONFIGS].sort(
       (a, b) => (b.payoutMultipliers[5] || 0) - (a.payoutMultipliers[5] || 0)
     );

@@ -14,7 +14,7 @@ export const GAME_CONFIG: GameConfig = {
     minBet: 1,
     maxBet: 100,
     defaultBet: 20,
-    linesPerSpin: 20, // All paylines active
+    linesPerSpin: 20,
   },
   animations: {
     spinDuration: 1000,
@@ -24,7 +24,6 @@ export const GAME_CONFIG: GameConfig = {
   symbols: SYMBOL_CONFIGS,
 };
 
-// Layout constants
 export const LAYOUT = {
   GAME_AREA_WIDTH: 800,
   GAME_AREA_HEIGHT: 600,

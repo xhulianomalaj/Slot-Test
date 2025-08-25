@@ -25,9 +25,8 @@ export class Reel extends PIXI.Container {
 
     this.initializeReel();
 
-    // Initialize animations with callbacks for symbol management
     this._animations = new ReelAnimations(
-      this, // Pass the reel container itself
+      this,
       this._symbols,
       this._symbolFactory,
       this._symbolHeight,
@@ -48,28 +47,20 @@ export class Reel extends PIXI.Container {
     return this._reelIndex;
   }
 
-  /**
-   * Initialize the reel with symbols
-   */
   private initializeReel(): void {
-    // Create extra symbols for smooth spinning animation
-    // We need visible symbols + buffer symbols above and below
-    const totalSymbols = this._visibleSymbols + 5; // 2 above, 3 below to include all 8 symbol types
+    const totalSymbols = this._visibleSymbols + 5;
 
     for (let i = 0; i < totalSymbols; i++) {
       const symbolType = generateSymbol();
       const symbol = this._symbolFactory.createSymbol(symbolType);
 
-      // Calculate and store initial position
       const initialY = (i - 2) * this._symbolHeight;
 
-      // Store initial visible symbol types and positions (positions 1, 2, 3 are the visible ones)
       if (i >= 1 && i < 1 + this._visibleSymbols) {
         this._initialSymbolTypes.push(symbolType);
         this._initialSymbolPositions.push(initialY);
       }
 
-      // Position symbols vertically (x=0 since reel is already positioned and symbol anchor is 0.5)
       symbol.x = 0;
       symbol.y = initialY;
 
@@ -78,77 +69,51 @@ export class Reel extends PIXI.Container {
     }
   }
 
-  /**
-   * Get the currently visible symbols (3 symbols in the middle)
-   */
   getVisibleSymbols(): Symbol[] {
-    const startIndex = 1; // Visible symbols are at indices 1, 2, 3 (works correctly on initial load)
+    const startIndex = 1;
     return this._symbols
       .slice(startIndex, startIndex + this._visibleSymbols)
       .filter((symbol) => symbol !== null && symbol !== undefined);
   }
 
-  /**
-   * Get the symbol types of visible symbols
-   */
   getVisibleSymbolTypes(): SymbolType[] {
     const visibleSymbols = this.getVisibleSymbols();
     const symbolTypes = visibleSymbols.map((symbol) => symbol.type);
     return symbolTypes;
   }
 
-  /**
-   * Get the initial symbol types that were set when the reel was first created
-   */
   getInitialSymbolTypes(): SymbolType[] {
     return [...this._initialSymbolTypes];
   }
 
-  /**
-   * Get the initial symbol positions that were set when the reel was first created
-   */
   getInitialSymbolPositions(): number[] {
     return [...this._initialSymbolPositions];
   }
 
-  /**
-   * Get current visible symbol positions for debugging
-   */
   getCurrentVisiblePositions(): number[] {
     return this.getVisibleSymbols().map((symbol) => symbol.y);
   }
 
-  /**
-   * Generate new random symbols for the reel
-   */
   generateNewSymbols(): void {
     this._symbols.forEach((symbol) => {
-      // Generate new random symbol type
       const newType = generateSymbol();
 
-      // Remove old symbol and create new one
       this.removeChild(symbol);
       symbol.destroy();
 
-      // Create new symbol with same position
       const newSymbol = this._symbolFactory.createSymbol(newType);
       newSymbol.x = symbol.x;
       newSymbol.y = symbol.y;
 
       this.addChild(newSymbol);
 
-      // Replace in array
       const index = this._symbols.indexOf(symbol);
       this._symbols[index] = newSymbol;
     });
 
-    // Update animations with new symbols reference
     this._animations.updateSymbolsReference(this._symbols);
   }
 
-  /**
-   * Set specific symbol types for the visible positions (used when stopping)
-   */
   setVisibleSymbolTypes(symbolTypes: SymbolType[]): void {
     if (symbolTypes.length !== this._visibleSymbols) {
       throw new Error(
@@ -162,16 +127,13 @@ export class Reel extends PIXI.Container {
       const currentSymbol = visibleSymbols[index];
 
       if (currentSymbol && currentSymbol.type !== symbolType) {
-        // Store position before destroying
         const symbolX = currentSymbol.x;
         const symbolY = currentSymbol.y;
         const symbolIndex = this._symbols.indexOf(currentSymbol);
 
-        // Remove current symbol
         this.removeChild(currentSymbol);
         currentSymbol.destroy();
 
-        // Create new symbol with correct type
         const newSymbol = this._symbolFactory.createSymbol(symbolType);
         newSymbol.x = symbolX;
         newSymbol.y = symbolY;
@@ -181,13 +143,9 @@ export class Reel extends PIXI.Container {
       }
     });
 
-    // Update animations with modified symbols
     this._animations.updateSymbolsReference(this._symbols);
   }
 
-  /**
-   * Reset reel to initial position after spinning
-   */
   resetPosition(): void {
     this._symbols.forEach((symbol, index) => {
       if (symbol && symbol.y !== undefined) {
@@ -196,17 +154,8 @@ export class Reel extends PIXI.Container {
     });
   }
 
-  /**
-   * Set spinning state (deprecated - handled by animations)
-   */
-  setSpinning(_spinning: boolean): void {
-    // This method is kept for backward compatibility but is no longer used
-    // Spinning state is now managed by the ReelAnimations class
-  }
+  setSpinning(_spinning: boolean): void {}
 
-  /**
-   * Get symbol at specific visible row (0-2)
-   */
   getSymbolAtRow(row: number): Symbol | null {
     if (row < 0 || row >= this._visibleSymbols) {
       return null;
@@ -216,40 +165,25 @@ export class Reel extends PIXI.Container {
     return visibleSymbols[row];
   }
 
-  /**
-   * Start spinning animation
-   */
   async spin(): Promise<void> {
     return this._animations.spin();
   }
 
-  /**
-   * Start instant spinning animation (for instant play mode)
-   */
   async instantSpin(): Promise<void> {
     return this._animations.instantSpin();
   }
 
-  /**
-   * Stop spinning naturally
-   */
   async stop(): Promise<void> {
     const result = await this._animations.stop();
 
-    // Reset to clean state after animation (like fresh page load)
     this.resetToCleanState();
 
     return result;
   }
 
-  /**
-   * Reset reel to clean initial state (like fresh page load)
-   */
   private resetToCleanState(): void {
-    // Reset container position to 0
     this.y = 0;
 
-    // Reset all symbol positions to their initial clean state
     this._symbols.forEach((symbol, index) => {
       if (symbol && symbol.y !== undefined) {
         symbol.y = (index - 2) * this._symbolHeight;
@@ -257,32 +191,20 @@ export class Reel extends PIXI.Container {
     });
   }
 
-  /**
-   * Stop spinning and return to initial symbol configuration
-   */
   async stopWithInitialSymbols(): Promise<void> {
     await this.stop();
   }
 
-  /**
-   * Force stop spinning immediately (emergency stop)
-   */
   forceStop(): void {
     this._animations.forceStop();
   }
 
-  /**
-   * Get spin duration based on reel index (for staggered stopping)
-   */
   getSpinDuration(): number {
     const baseDuration = GAME_CONFIG.animations.spinDuration;
     const staggerDelay = GAME_CONFIG.animations.reelStopDelay * this._reelIndex;
     return baseDuration + staggerDelay;
   }
 
-  /**
-   * Highlight symbol at specific row
-   */
   highlightSymbolAt(row: number): void {
     const symbol = this.getSymbolAtRow(row);
     if (symbol) {
@@ -290,9 +212,6 @@ export class Reel extends PIXI.Container {
     }
   }
 
-  /**
-   * Clear all highlights on this reel
-   */
   clearHighlights(): void {
     this._symbols.forEach((symbol) => {
       if (symbol) {
@@ -301,9 +220,6 @@ export class Reel extends PIXI.Container {
     });
   }
 
-  /**
-   * Cleanup resources
-   */
   override destroy(): void {
     this.forceStop();
     this._symbols.forEach((symbol) => {

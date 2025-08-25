@@ -1,10 +1,6 @@
 import { SymbolType } from "../../types";
 import type { SymbolConfig } from "../../types";
 
-/**
- * Symbol configuration data using individual PNG files
- * Each symbol now uses its own PNG file instead of sprite sheet coordinates
- */
 export const SYMBOL_CONFIGS: SymbolConfig[] = [
   {
     type: SymbolType.APPLE,
@@ -96,9 +92,6 @@ export const SYMBOL_CONFIGS: SymbolConfig[] = [
   },
 ];
 
-/**
- * Get symbol configuration by type
- */
 export function getSymbolConfig(type: SymbolType): SymbolConfig {
   const config = SYMBOL_CONFIGS.find((config) => config.type === type);
   if (!config) {
@@ -107,21 +100,15 @@ export function getSymbolConfig(type: SymbolType): SymbolConfig {
   return config;
 }
 
-/**
- * Get all symbol types ordered by rarity (most common first)
- */
 export function getSymbolsByRarity(): SymbolType[] {
   return SYMBOL_CONFIGS.sort((a, b) => b.rarity - a.rarity).map(
     (config) => config.type
   );
 }
 
-/**
- * Generate a random symbol based on rarity weights
- */
 let randomOrderIndex = 0;
 let randomCurrentReelSymbols: string[] = [];
-let shouldLogSymbols = true; // Flag to control when to log symbols
+let shouldLogSymbols = true;
 
 export function generateRandomSymbol(): SymbolType {
   const totalWeight = SYMBOL_CONFIGS.reduce(
@@ -135,23 +122,20 @@ export function generateRandomSymbol(): SymbolType {
     if (random <= 0) {
       const symbolName = config.name;
 
-      // Add console logging for random generation too
       const symbolsPerReel = 7;
       // const reelNumber = Math.floor(randomOrderIndex / symbolsPerReel) + 1;
       const positionInReel = randomOrderIndex % symbolsPerReel;
 
-      // Only collect visible symbols (positions 1, 2, 3 are actually visible)
       if (positionInReel >= 1 && positionInReel <= 3) {
         randomCurrentReelSymbols.push(symbolName);
       }
 
-      // When we have 3 visible symbols (complete reel), display them if logging is enabled
       if (randomCurrentReelSymbols.length === 3) {
         if (shouldLogSymbols) {
           //   `Reel ${reelNumber}: [${randomCurrentReelSymbols.join(", ")}]`
           // );
         }
-        randomCurrentReelSymbols = []; // Reset for next reel
+        randomCurrentReelSymbols = [];
       }
 
       randomOrderIndex++;
@@ -159,15 +143,10 @@ export function generateRandomSymbol(): SymbolType {
     }
   }
 
-  // Fallback to first symbol if something goes wrong
   randomOrderIndex++;
   return SYMBOL_CONFIGS[0].type;
 }
 
-/**
- * Generate symbols in order for coordinate mapping
- * Cycles through all symbol types in the enum order
- */
 let orderIndex = 0;
 let currentReelSymbols: string[] = [];
 let allGeneratedSymbols: string[] = [];
@@ -176,33 +155,26 @@ export function generateOrderedSymbol(): SymbolType {
   const symbol = symbols[orderIndex % symbols.length];
   const symbolName = getSymbolConfig(symbol).name;
 
-  // Store all generated symbols
   allGeneratedSymbols.push(symbolName);
 
-  // Each reel has 7 symbols total
   const symbolsPerReel = 7;
   // const reelNumber = Math.floor(orderIndex / symbolsPerReel) + 1;
   const positionInReel = orderIndex % symbolsPerReel;
 
-  // Only collect visible symbols (positions 1, 2, 3 are actually visible)
   if (positionInReel >= 1 && positionInReel <= 3) {
     currentReelSymbols.push(symbolName);
   }
 
-  // When we have 3 visible symbols (complete reel), display them if logging is enabled
   if (currentReelSymbols.length === 3) {
     if (shouldLogSymbols) {
     }
-    currentReelSymbols = []; // Reset for next reel
+    currentReelSymbols = [];
   }
 
   orderIndex++;
   return symbol;
 }
 
-/**
- * Reset the order index for ordered generation
- */
 export function resetOrderIndex(): void {
   orderIndex = 0;
   randomOrderIndex = 0;
@@ -213,38 +185,22 @@ export function resetOrderIndex(): void {
   }
 }
 
-/**
- * Enable symbol logging (for initial load and after animations end)
- */
 export function enableSymbolLogging(): void {
   shouldLogSymbols = true;
 }
 
-/**
- * Disable symbol logging (during spins)
- */
 export function disableSymbolLogging(): void {
   shouldLogSymbols = false;
 }
 
-/**
- * Toggle for using ordered vs random symbol generation
- * Set to true temporarily for coordinate mapping
- */
 export let useOrderedGeneration = false;
 
-/**
- * Generate a symbol based on current mode (ordered or random)
- */
 export function generateSymbol(): SymbolType {
   return useOrderedGeneration
     ? generateOrderedSymbol()
     : generateRandomSymbol();
 }
 
-/**
- * Toggle generation mode
- */
 export function setGenerationMode(ordered: boolean): void {
   useOrderedGeneration = ordered;
   if (ordered) {
@@ -252,22 +208,13 @@ export function setGenerationMode(ordered: boolean): void {
   }
 }
 
-/**
- * Helper function to get symbol by name
- */
 export const getSymbolByName = (name: string): SymbolConfig | undefined => {
   return SYMBOL_CONFIGS.find((config) => config.name === name);
 };
 
-/**
- * Helper to get all unique symbol names
- */
 export const getAllSymbolNames = (): string[] => {
   return [...new Set(SYMBOL_CONFIGS.map((config) => config.name))];
 };
 
-/**
- * Legacy exports for backward compatibility
- */
-export const SPRITE_SHEET_PATH = ""; // No longer used with individual PNGs
+export const SPRITE_SHEET_PATH = "";
 export const getRandomSymbol = generateRandomSymbol;

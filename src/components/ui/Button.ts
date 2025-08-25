@@ -27,7 +27,6 @@ export class Button extends PIXI.Container {
   constructor(options: ButtonOptions = {}) {
     super();
 
-    // Set default options
     this.options = {
       width: 120,
       height: 40,
@@ -78,7 +77,6 @@ export class Button extends PIXI.Container {
     this._isPressed = true;
     this.updateVisuals();
 
-    // Scale down animation
     gsap.to(this.scale, {
       x: 0.95,
       y: 0.95,
@@ -94,7 +92,6 @@ export class Button extends PIXI.Container {
       this._isPressed = false;
       this.updateVisuals();
 
-      // Scale back up animation
       gsap.to(this.scale, {
         x: 1,
         y: 1,
@@ -102,7 +99,6 @@ export class Button extends PIXI.Container {
         ease: "power2.out",
       });
 
-      // Trigger click callback
       if (this.clickCallback) {
         this.clickCallback();
       }
@@ -115,7 +111,6 @@ export class Button extends PIXI.Container {
     this._isPressed = false;
     this.updateVisuals();
 
-    // Scale back up animation
     gsap.to(this.scale, {
       x: 1,
       y: 1,
@@ -130,7 +125,6 @@ export class Button extends PIXI.Container {
     this._isHovered = true;
     this.updateVisuals();
 
-    // Hover animation
     gsap.to(this.scale, {
       x: 1.05,
       y: 1.05,
@@ -145,7 +139,6 @@ export class Button extends PIXI.Container {
     this._isHovered = false;
     this.updateVisuals();
 
-    // Return to normal scale
     gsap.to(this.scale, {
       x: 1,
       y: 1,
@@ -167,7 +160,6 @@ export class Button extends PIXI.Container {
       backgroundColor = this.options.hoverColor;
     }
 
-    // Draw background with rounded corners
     if (this.options.borderRadius > 0) {
       this.background.roundRect(
         -this.options.width / 2,
@@ -187,7 +179,6 @@ export class Button extends PIXI.Container {
 
     this.background.fill({ color: backgroundColor });
 
-    // Draw border if specified
     if (this.options.borderWidth > 0) {
       this.background.stroke({
         color: this.options.borderColor,
@@ -195,16 +186,13 @@ export class Button extends PIXI.Container {
       });
     }
 
-    // Center the label
     this.textLabel.anchor.set(0.5);
     this.textLabel.x = 0;
     this.textLabel.y = 0;
 
-    // Update cursor
     this.cursor = this._enabled ? "pointer" : "default";
   }
 
-  // Public methods
   get enabled(): boolean {
     return this._enabled;
   }
@@ -252,38 +240,31 @@ export class Button extends PIXI.Container {
     this.updateVisuals();
   }
 
-  /**
-   * Simulate a button press effect for keyboard triggers
-   */
   simulatePress(): void {
     if (!this._enabled) return;
 
-    // Temporarily set pressed state for visual effect
     this._isPressed = true;
     this.updateVisuals();
 
-    // Scale down animation
     gsap.to(this.scale, {
       x: 0.95,
       y: 0.95,
       duration: 0.1,
       ease: "power2.out",
       onComplete: () => {
-        // Reset pressed state and scale back up
         this._isPressed = false;
         this.updateVisuals();
-        
+
         gsap.to(this.scale, {
           x: 1,
           y: 1,
           duration: 0.1,
           ease: "power2.out",
         });
-      }
+      },
     });
   }
 
-  // Cleanup
   override destroy(): void {
     this.removeAllListeners();
     gsap.killTweensOf(this.scale);

@@ -11,7 +11,6 @@ export class GameUI extends PIXI.Container {
   private stateManager: GameStateManager;
   private slotMachine: SlotMachine | null = null;
 
-  // UI Components
   private spinButton!: Button;
   private increaseBetButton!: Button;
   private decreaseBetButton!: Button;
@@ -23,16 +22,13 @@ export class GameUI extends PIXI.Container {
   private linesWonDisplay!: TextDisplay;
   private multiplierDisplay!: TextDisplay;
 
-  // Store current win information
   private currentWinInfo: { linesWon: number; maxMultiplier: number } = {
     linesWon: 0,
     maxMultiplier: 0,
   };
 
-  // Track initial balance for profit/loss calculation
   private initialBalance: number;
 
-  // Layout constants
   private readonly UI_WIDTH = 1200;
   private readonly UI_HEIGHT = 120;
 
@@ -41,7 +37,6 @@ export class GameUI extends PIXI.Container {
 
     this.stateManager = stateManager;
 
-    // Store initial balance for profit/loss tracking
     this.initialBalance = stateManager.context.balance;
 
     this.createUIComponents();
@@ -50,15 +45,11 @@ export class GameUI extends PIXI.Container {
     this.subscribeToStateChanges();
   }
 
-  /**
-   * Set the slot machine reference for instant play functionality
-   */
   public setSlotMachine(slotMachine: SlotMachine): void {
     this.slotMachine = slotMachine;
   }
 
   private createUIComponents(): void {
-    // Spin button (main action button)
     this.spinButton = new Button({
       width: 120,
       height: 50,
@@ -69,7 +60,6 @@ export class GameUI extends PIXI.Container {
       disabledColor: 0x95a5a6,
     });
 
-    // Bet control buttons
     this.increaseBetButton = new Button({
       width: 40,
       height: 30,
@@ -88,7 +78,6 @@ export class GameUI extends PIXI.Container {
       hoverColor: 0x2980b9,
     });
 
-    // Instant Play toggle button
     this.instantPlayToggle = new ToggleButton({
       width: 120,
       height: 35,
@@ -102,11 +91,10 @@ export class GameUI extends PIXI.Container {
       defaultState: false,
     });
 
-    // Display components
     this.balanceDisplay = new TextDisplay("$1000", {
-      width: 150, // Wider balance display
-      height: 40, // Taller balance display
-      fontSize: 18, // Larger text
+      width: 150,
+      height: 40,
+      fontSize: 18,
       fontColor: 0xf1c40f,
       backgroundColor: 0x2c3e50,
       borderColor: 0xf39c12,
@@ -137,7 +125,6 @@ export class GameUI extends PIXI.Container {
       backgroundColor: 0x34495e,
     });
 
-    // Lines won display
     this.linesWonDisplay = new TextDisplay("0 LINES", {
       width: 80,
       height: 30,
@@ -147,7 +134,6 @@ export class GameUI extends PIXI.Container {
       borderColor: 0xf39c12,
     });
 
-    // Multiplier display
     this.multiplierDisplay = new TextDisplay("0X", {
       width: 80,
       height: 25,
@@ -157,7 +143,6 @@ export class GameUI extends PIXI.Container {
       borderColor: 0xe74c3c,
     });
 
-    // Add all components to container
     this.addChild(this.spinButton);
     this.addChild(this.increaseBetButton);
     this.addChild(this.decreaseBetButton);
@@ -171,22 +156,18 @@ export class GameUI extends PIXI.Container {
   }
 
   private setupLayout(): void {
-    // Center everything in the UI area
     const centerX = 0;
     const centerY = 0;
 
-    // Spin button in the center
     this.spinButton.x = centerX;
     this.spinButton.y = centerY;
 
-    // Lines won and multiplier displays to the right of spin button
     this.linesWonDisplay.x = centerX + 150;
     this.linesWonDisplay.y = centerY - 10;
 
     this.multiplierDisplay.x = centerX + 150;
     this.multiplierDisplay.y = centerY + 25;
 
-    // Bet controls to the left of spin button
     const betControlsX = centerX - 200;
     this.decreaseBetButton.x = betControlsX - 100;
     this.decreaseBetButton.y = centerY;
@@ -197,73 +178,59 @@ export class GameUI extends PIXI.Container {
     this.increaseBetButton.x = betControlsX + 25;
     this.increaseBetButton.y = centerY;
 
-    // Balance display to the left of bet controls (moved closer to center)
     this.balanceDisplay.x = centerX - 450;
     this.balanceDisplay.y = centerY;
 
-    // Win displays to the right of spin button
     this.winDisplay.x = centerX + 300;
     this.winDisplay.y = centerY - 10;
 
     this.lastWinDisplay.x = centerX + 300;
     this.lastWinDisplay.y = centerY + 30;
 
-    // Instant Play toggle to the right of win displays
     this.instantPlayToggle.x = centerX + 450;
     this.instantPlayToggle.y = centerY + 10;
   }
 
   private setupEventHandlers(): void {
-    // Spin button
     this.spinButton.onClick(() => {
       if (this.stateManager.canSpin) {
         SoundManager.getInstance().playButtonPressSound();
-        // Small delay to let button press sound play before spinning sound
         setTimeout(() => {
           this.stateManager.spin();
         }, 250);
       }
     });
 
-    // Bet control buttons
     this.increaseBetButton.onClick(() => {
       SoundManager.getInstance().playButtonPressSound();
       this.stateManager.increaseBet();
-      // Update the input field to reflect the new bet value
       this.betInput.value = this.stateManager.context.currentBet.toString();
     });
 
     this.decreaseBetButton.onClick(() => {
       SoundManager.getInstance().playButtonPressSound();
       this.stateManager.decreaseBet();
-      // Update the input field to reflect the new bet value
       this.betInput.value = this.stateManager.context.currentBet.toString();
     });
 
-    // Bet input field
     this.betInput.onChange((value: string) => {
       if (value === "" || value.trim() === "") {
-        // Don't call setBet when field is empty - just force UI update
         this.updateUI(this.stateManager.context);
         return;
       }
       const numValue = parseInt(value) || 0;
-      // Remove range constraint - allow any value for proper validation
       this.stateManager.setBet(numValue);
     });
 
     this.betInput.onEnter((value: string) => {
       if (value === "" || value.trim() === "") {
-        // Don't set any value when empty - just let validation handle it
         return;
       }
       const numValue = parseInt(value) || 0;
-      // Remove automatic clamping - let the user enter any value
       this.stateManager.setBet(numValue);
       this.betInput.value = numValue.toString();
     });
 
-    // Instant Play toggle
     this.instantPlayToggle.onClick((isToggled: boolean) => {
       SoundManager.getInstance().playButtonPressSound();
       if (this.slotMachine) {
@@ -281,11 +248,8 @@ export class GameUI extends PIXI.Container {
   }
 
   private updateUI(context: GameContext): void {
-    // Update displays
     this.balanceDisplay.setCurrency(context.balance);
-    // Don't automatically update betInput.value - let user control it
 
-    // Win display logic: Show current win amount when there's a win, but reset to 0 on new spins
     const currentState = this.stateManager.currentState;
     if (
       context.lastWin > 0 &&
@@ -296,7 +260,6 @@ export class GameUI extends PIXI.Container {
       this.winDisplay.setCurrency(0);
     }
 
-    // Balance tracking display: Show total profit/loss since page load
     const totalProfitLoss = context.balance - this.initialBalance;
     const profitLossText =
       totalProfitLoss >= 0
@@ -304,20 +267,16 @@ export class GameUI extends PIXI.Container {
         : `-$${Math.abs(totalProfitLoss)}`;
     this.lastWinDisplay.setText(profitLossText);
 
-    // Update lines won and multiplier displays
     this.updateWinInformation(context);
 
-    // Update button states based on game state and context
     // currentState is already declared above
 
-    // Check if bet exceeds balance or is invalid (check input field state first)
     const betExceedsBalance = context.currentBet > context.balance;
     const invalidBet =
       context.currentBet <= 0 ||
       this.betInput.value === "" ||
       this.betInput.value.trim() === "";
 
-    // Spin button state - disable if bet exceeds balance, is invalid, or other conditions
     this.spinButton.enabled =
       context.canSpin &&
       currentState === "idle" &&
@@ -329,38 +288,32 @@ export class GameUI extends PIXI.Container {
     } else if (invalidBet) {
       this.spinButton.setTextWithFontSize("ENTER BET", 16);
     } else if (betExceedsBalance) {
-      this.spinButton.setTextWithFontSize("BET TOO HIGH", 14); // Smaller font size
+      this.spinButton.setTextWithFontSize("BET TOO HIGH", 14);
     } else if (!context.canSpin && context.balance < context.currentBet) {
       this.spinButton.setTextWithFontSize("NO FUNDS", 18);
     } else {
       this.spinButton.setTextWithFontSize("SPIN", 18);
     }
 
-    // Bet control buttons
     this.increaseBetButton.enabled =
       currentState === "idle" && context.balance >= context.currentBet + 5;
 
     this.decreaseBetButton.enabled =
       currentState === "idle" && context.currentBet > 1;
 
-    // Instant Play toggle - disable during spinning
     this.instantPlayToggle.enabled = currentState === "idle";
 
-    // Animate win display when there's a new win
     if (context.lastWin > 0 && currentState === "celebrating") {
       this.animateWin(context.lastWin);
     }
   }
 
   private animateWin(_winAmount: number): void {
-    // Flash the win display
     this.winDisplay.flash(0xf1c40f, 0.5);
     this.winDisplay.pulse(1.3, 0.4);
 
-    // Flash the last win display
     this.lastWinDisplay.flash(0x2ecc71, 0.5);
 
-    // Flash the lines won and multiplier displays
     this.linesWonDisplay.flash(0xf39c12, 0.5);
     this.linesWonDisplay.pulse(1.2, 0.3);
     this.multiplierDisplay.flash(0xe74c3c, 0.5);
@@ -368,7 +321,6 @@ export class GameUI extends PIXI.Container {
   }
 
   private updateWinInformation(context: GameContext): void {
-    // Check if we have fresh win data to capture
     if (
       context.reelResults &&
       context.reelResults.wins &&
@@ -376,14 +328,12 @@ export class GameUI extends PIXI.Container {
     ) {
       const wins = context.reelResults.wins;
       this.currentWinInfo.linesWon = wins.length;
-      // Sum all multipliers instead of taking the max
       this.currentWinInfo.maxMultiplier = wins.reduce(
         (sum, win) => sum + win.multiplier,
         0
       );
     }
 
-    // Use stored win information if we have any
     const currentState = this.stateManager.currentState;
     const hasWins = this.currentWinInfo.linesWon > 0;
     const isShowingWins =
@@ -391,21 +341,17 @@ export class GameUI extends PIXI.Container {
       (context.lastWin > 0 && currentState === "idle");
 
     if (hasWins && isShowingWins) {
-      // Update lines won display
       const lineText =
         this.currentWinInfo.linesWon === 1
           ? "1 LINE"
           : `${this.currentWinInfo.linesWon} LINES`;
       this.linesWonDisplay.setText(lineText);
 
-      // Update multiplier display
       this.multiplierDisplay.setText(`${this.currentWinInfo.maxMultiplier}X`);
 
-      // Make displays visible when there are wins
       this.linesWonDisplay.alpha = 1.0;
       this.multiplierDisplay.alpha = 1.0;
     } else if (!isShowingWins) {
-      // Clear win info when not showing wins (new spin started)
       this.currentWinInfo = { linesWon: 0, maxMultiplier: 0 };
       this.linesWonDisplay.setText("0 LINES");
       this.multiplierDisplay.setText("0X");
@@ -414,7 +360,6 @@ export class GameUI extends PIXI.Container {
     }
   }
 
-  // Public methods for external control
   public updateBalance(newBalance: number): void {
     this.balanceDisplay.animateCurrency(newBalance);
   }
@@ -435,7 +380,6 @@ export class GameUI extends PIXI.Container {
     }
   }
 
-  // Instant Play control methods
   public get isInstantPlayEnabled(): boolean {
     return this.instantPlayToggle.isToggled;
   }
@@ -444,7 +388,6 @@ export class GameUI extends PIXI.Container {
     this.instantPlayToggle.isToggled = enabled;
   }
 
-  // Get UI dimensions for layout purposes
   public getUIDimensions(): { width: number; height: number } {
     return {
       width: this.UI_WIDTH,
@@ -452,14 +395,10 @@ export class GameUI extends PIXI.Container {
     };
   }
 
-  /**
-   * Simulate spin button press effect for keyboard triggers
-   */
   public simulateSpinButtonPress(): void {
     this.spinButton.simulatePress();
   }
 
-  // Cleanup
   override destroy(): void {
     this.stateManager.unsubscribe("gameUI");
     super.destroy();

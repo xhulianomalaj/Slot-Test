@@ -33,7 +33,6 @@ const initialContext: GameContext = {
   canSpin: true,
 };
 
-// Create the game state machine
 export const gameStateMachine = createMachine(
   {
     id: "slotGame",
@@ -125,7 +124,7 @@ export const gameStateMachine = createMachine(
         balance: context.balance - context.currentBet,
         canSpin: false,
         isSpinning: true,
-        lastWin: 0, // Clear previous win when new spin starts
+        lastWin: 0,
       })),
       addWinnings: assign(({ context }) => {
         const winAmount = context.reelResults?.totalWin || 0;
@@ -169,7 +168,7 @@ export const gameStateMachine = createMachine(
       }),
       setBet: assign(({ context, event }) => {
         if (event.type === "SET_BET") {
-          const newBet = event.amount; // Remove automatic clamping - let UI handle validation
+          const newBet = event.amount;
           return {
             ...context,
             currentBet: newBet,

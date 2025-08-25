@@ -4,10 +4,6 @@ import { PaylineRendererV5 } from "../ui/PaylineRendererV5";
 import { Reel } from "./Reel";
 import { SoundManager } from "../audio/SoundManager";
 
-/**
- * Handles all animation and celebration aspects of the slot machine
- * Including win celebrations, highlighting, and payline animations
- */
 export class SlotMachineAnimations {
   private _reels: Reel[];
   private _paylineRenderer: PaylineRendererV5;
@@ -23,9 +19,6 @@ export class SlotMachineAnimations {
     this.setupPaylineCallbacks();
   }
 
-  /**
-   * Setup animation callbacks to integrate with game state
-   */
   private setupPaylineCallbacks(): void {
     this._paylineRenderer.setAnimationCallbacks(
       () => this._animationCallbacks.onStart?.(),
@@ -34,9 +27,6 @@ export class SlotMachineAnimations {
     );
   }
 
-  /**
-   * Set animation event callbacks
-   */
   setAnimationCallbacks(callbacks: {
     onStart?: () => void;
     onEnd?: () => void;
@@ -45,9 +35,6 @@ export class SlotMachineAnimations {
     this._animationCallbacks = { ...callbacks };
   }
 
-  /**
-   * Highlight winning symbols
-   */
   highlightWinningSymbols(winResults: WinResult[]): void {
     // First, remove all existing highlights
     this.clearHighlights();
@@ -64,9 +51,6 @@ export class SlotMachineAnimations {
     });
   }
 
-  /**
-   * Clear all symbol highlights
-   */
   clearHighlights(): void {
     this._reels.forEach((reel) => {
       reel.getVisibleSymbols().forEach((symbol) => {
@@ -75,9 +59,6 @@ export class SlotMachineAnimations {
     });
   }
 
-  /**
-   * Start win celebration animation
-   */
   async celebrateWin(spinResult: SpinResult): Promise<void> {
     if (!WinEvaluator.hasWins(spinResult)) {
       return;
@@ -96,24 +77,15 @@ export class SlotMachineAnimations {
     await this._paylineRenderer.showWinningPaylines(spinResult.wins);
   }
 
-  /**
-   * End win celebration and clear highlights
-   */
   endWinCelebration(): void {
     this.clearHighlights();
     this._paylineRenderer.clearAll();
   }
 
-  /**
-   * Check if any reel is still spinning
-   */
   hasSpinningReels(): boolean {
     return this._reels.some((reel) => reel.isSpinning);
   }
 
-  /**
-   * Force stop all reels immediately
-   */
   forceStopAllReels(): void {
     this._reels.forEach((reel) => {
       reel.forceStop();

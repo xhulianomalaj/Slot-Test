@@ -1,10 +1,6 @@
 import * as PIXI from "pixi.js";
 import { GAME_CONFIG, LAYOUT } from "../config/GameConfig";
 
-/**
- * Handles all visual rendering aspects of the slot machine
- * Including frame, separators, layout, and masking
- */
 export class SlotMachineRenderer {
   private _reelCount: number;
   private _rowCount: number;
@@ -18,9 +14,6 @@ export class SlotMachineRenderer {
     this._reelSeparators = new PIXI.Graphics();
   }
 
-  /**
-   * Create the visual frame and walls of the slot machine
-   */
   createSlotMachineFrame(): PIXI.Graphics {
     const symbolWidth = GAME_CONFIG.reels.symbolWidth;
     const symbolHeight = GAME_CONFIG.reels.symbolHeight;
@@ -31,10 +24,9 @@ export class SlotMachineRenderer {
 
     // Frame thickness and colors
     const frameThickness = 8;
-    const frameColor = 0x2c3e50; // Dark blue-gray
-    const innerFrameColor = 0x34495e; // Slightly lighter
+    const frameColor = 0x2c3e50;
+    const innerFrameColor = 0x34495e;
 
-    // Create outer frame
     this._frame.clear();
 
     // Outer frame background (darker)
@@ -55,24 +47,19 @@ export class SlotMachineRenderer {
     );
     this._frame.fill({ color: innerFrameColor });
 
-    // Create the window (semi-transparent grey background where symbols show)
     this._frame.rect(
       -totalWidth / 2,
       -totalHeight / 2,
       totalWidth,
       totalHeight
     );
-    this._frame.fill({ color: 0x808080, alpha: 0.5 }); // Solid grey background (transparency handled by frame alpha)
+    this._frame.fill({ color: 0x808080, alpha: 0.5 });
 
-    // Set alpha on the entire frame for transparency
     this._frame.alpha = 0.5;
 
     return this._frame;
   }
 
-  /**
-   * Create vertical separators between reels
-   */
   createReelSeparators(): PIXI.Graphics {
     const symbolWidth = GAME_CONFIG.reels.symbolWidth;
     const symbolHeight = GAME_CONFIG.reels.symbolHeight;
@@ -83,7 +70,6 @@ export class SlotMachineRenderer {
 
     this._reelSeparators.clear();
 
-    // Create separators between reels (not before first or after last)
     for (let i = 1; i < this._reelCount; i++) {
       const separatorX =
         -(
@@ -106,9 +92,6 @@ export class SlotMachineRenderer {
     return this._reelSeparators;
   }
 
-  /**
-   * Calculate layout positions for reels
-   */
   calculateReelPositions(): { x: number; y: number }[] {
     const symbolWidth = GAME_CONFIG.reels.symbolWidth;
     const reelSpacing = LAYOUT.REEL_SPACING;
@@ -120,16 +103,13 @@ export class SlotMachineRenderer {
     for (let i = 0; i < this._reelCount; i++) {
       positions.push({
         x: startX + i * (symbolWidth + reelSpacing),
-        y: 0, // Center vertically
+        y: 0,
       });
     }
 
     return positions;
   }
 
-  /**
-   * Create a mask to clip reel symbols to the visible area
-   */
   createReelMask(): PIXI.Graphics {
     const symbolWidth = GAME_CONFIG.reels.symbolWidth;
     const symbolHeight = GAME_CONFIG.reels.symbolHeight;
@@ -145,25 +125,16 @@ export class SlotMachineRenderer {
     return mask;
   }
 
-  /**
-   * Get the total width of the slot machine
-   */
   getTotalWidth(): number {
     const symbolWidth = GAME_CONFIG.reels.symbolWidth;
     const reelSpacing = LAYOUT.REEL_SPACING;
     return symbolWidth * this._reelCount + reelSpacing * (this._reelCount - 1);
   }
 
-  /**
-   * Get the total height of the slot machine
-   */
   getTotalHeight(): number {
     return GAME_CONFIG.reels.symbolHeight * this._rowCount;
   }
 
-  /**
-   * Cleanup resources
-   */
   destroy(): void {
     this._frame.destroy();
     this._reelSeparators.destroy();

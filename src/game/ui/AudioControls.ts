@@ -22,7 +22,6 @@ export class AudioControls extends PIXI.Container {
 
   private async createAudioControls(): Promise<void> {
     try {
-      // Load the music, sound, and info PNG icons
       const musicTexture = await PIXI.Assets.load(
         "assets/images/symbols/music.png"
       );
@@ -33,7 +32,6 @@ export class AudioControls extends PIXI.Container {
         "assets/images/symbols/info.png"
       );
 
-      // Create white background squares
       this.musicBackground = new PIXI.Graphics();
       this.musicBackground.rect(0, 0, 44, 44);
       this.musicBackground.fill(0xffffff);
@@ -49,7 +47,6 @@ export class AudioControls extends PIXI.Container {
       this.infoBackground.fill(0xffffff);
       this.infoBackground.alpha = 1;
 
-      // Create music button
       this.musicButton = new PIXI.Sprite(musicTexture);
       this.musicButton.width = 40;
       this.musicButton.height = 40;
@@ -59,7 +56,6 @@ export class AudioControls extends PIXI.Container {
       this.musicButton.cursor = "pointer";
       this.musicButton.on("pointerdown", () => this.toggleMusic());
 
-      // Create sound button
       this.soundButton = new PIXI.Sprite(soundTexture);
       this.soundButton.width = 40;
       this.soundButton.height = 40;
@@ -69,7 +65,6 @@ export class AudioControls extends PIXI.Container {
       this.soundButton.cursor = "pointer";
       this.soundButton.on("pointerdown", () => this.toggleSound());
 
-      // Create info button
       this.infoButton = new PIXI.Sprite(infoTexture);
       this.infoButton.width = 40;
       this.infoButton.height = 40;
@@ -79,7 +74,6 @@ export class AudioControls extends PIXI.Container {
       this.infoButton.cursor = "pointer";
       this.infoButton.on("pointerdown", () => this.showInfo());
 
-      // Create red diagonal lines for mute indicators
       this.musicMuteLine = new PIXI.Graphics();
       this.musicMuteLine.moveTo(4, 4);
       this.musicMuteLine.lineTo(42, 42);
@@ -92,18 +86,13 @@ export class AudioControls extends PIXI.Container {
       this.soundMuteLine.stroke({ color: 0xff0000, width: 3 });
       this.soundMuteLine.visible = false;
 
-      // Position in top left corner
       this.x = 20;
       this.y = 20;
 
-      // Position sound button background and button further to the right
       this.soundBackground.x = this.musicBackground.width + 20;
-
-      // Position info button background further to the right
       this.infoBackground.x =
         this.soundBackground.x + this.soundBackground.width + 20;
 
-      // Add backgrounds first, then buttons, then mute lines
       this.addChild(this.musicBackground);
       this.addChild(this.musicButton);
       this.addChild(this.musicMuteLine);
@@ -113,13 +102,8 @@ export class AudioControls extends PIXI.Container {
       this.addChild(this.infoBackground);
       this.addChild(this.infoButton);
 
-      // Position sound button relative to its background
       this.soundButton.x = this.soundBackground.x + 2;
-
-      // Position info button relative to its background
       this.infoButton.x = this.infoBackground.x + 2;
-
-      // Position sound mute line relative to sound background
       this.soundMuteLine.x = this.soundBackground.x;
     } catch (error) {
       console.error(
@@ -151,22 +135,15 @@ export class AudioControls extends PIXI.Container {
   }
 
   private showInfo(): void {
-    // Prevent multiple info panels from opening
     if (this.currentInfoPanel) {
       return;
     }
 
-    // Create the HTML-based info panel
-    this.currentInfoPanel = new InfoPanel(() => {
-      delete this.currentInfoPanel;
-    });
-
-    // Show the panel (it will handle adding itself to the DOM)
+    this.currentInfoPanel = new InfoPanel();
     this.currentInfoPanel.show();
   }
 
   public override destroy(): void {
-    // Clean up info panel if it exists
     if (this.currentInfoPanel) {
       this.currentInfoPanel.destroy();
       delete this.currentInfoPanel;

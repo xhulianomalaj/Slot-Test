@@ -3,9 +3,9 @@ import type { WinResult, PaylineConfig, SymbolType } from "../../types";
 
 // Animation timing configurations
 export const ANIMATION_TIMINGS = {
-  SHOW_ALL_DURATION: 1000, // Time to show all wins together
-  INDIVIDUAL_WIN_DURATION: 3000, // 3 seconds per individual win (will be overridden by promises)
-  CYCLE_DELAY: 500, // Delay between win cycles
+  SHOW_ALL_DURATION: 1000,
+  INDIVIDUAL_WIN_DURATION: 3000,
+  CYCLE_DELAY: 500,
 };
 
 // Payline state machine context
@@ -157,14 +157,12 @@ export const paylineStateMachine = createMachine(
           input: ({ context, event }) => ({
             reelResults: context.reelResults!,
             currentBet:
-              event.type === "EVALUATE_PAYLINES" ? event.currentBet : 20, // fallback to default
+              event.type === "EVALUATE_PAYLINES" ? event.currentBet : 20,
             onProgress: (
               _progress: number,
               _total: number,
               _evaluatedPaylines: PaylineConfig[]
-            ) => {
-              // This would trigger a progress event in a real implementation
-            },
+            ) => {},
           }),
           onDone: {
             target: "evaluationComplete",

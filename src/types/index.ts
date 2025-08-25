@@ -18,9 +18,9 @@ export interface Position {
 export interface SymbolConfig {
   type: SymbolType;
   name: string;
-  rarity: number; // 0-1, where 1 is most common
-  payoutMultipliers: { [key: number]: number }; // key = symbol count, value = multiplier
-  imagePath: string; // Path to individual PNG file
+  rarity: number;
+  payoutMultipliers: { [key: number]: number };
+  imagePath: string;
 }
 
 export interface WinResult {
@@ -55,7 +55,7 @@ export interface GameConfig {
     minBet: number;
     maxBet: number;
     defaultBet: number;
-    linesPerSpin: number; // All paylines active
+    linesPerSpin: number;
   };
   animations: {
     spinDuration: number;

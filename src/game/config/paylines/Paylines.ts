@@ -1,9 +1,5 @@
 import type { PaylineConfig } from "../../../types";
 
-/**
- * All 20 payline configurations based on the provided pattern image
- * Each payline represents a specific path through the 5x3 reel grid
- */
 export const ALL_PAYLINES: PaylineConfig[] = [
   // Payline 1: Middle row straight
   {

@@ -32,7 +32,6 @@ export class ToggleButton extends PIXI.Container {
   constructor(options: ToggleButtonOptions = {}) {
     super();
 
-    // Set default options
     this.options = {
       width: 100,
       height: 35,
@@ -217,7 +216,6 @@ export class ToggleButton extends PIXI.Container {
       });
     }
 
-    // Update text based on toggle state
     this.textLabel.text = this._isToggled
       ? this.options.onText
       : this.options.offText;
@@ -227,11 +225,9 @@ export class ToggleButton extends PIXI.Container {
     this.textLabel.x = 0;
     this.textLabel.y = 0;
 
-    // Update cursor
     this.cursor = this._enabled ? "pointer" : "default";
   }
 
-  // Public methods
   get enabled(): boolean {
     return this._enabled;
   }
@@ -297,7 +293,6 @@ export class ToggleButton extends PIXI.Container {
     this.isToggled = !this._isToggled;
   }
 
-  // Cleanup
   override destroy(): void {
     this.removeAllListeners();
     gsap.killTweensOf(this.scale);

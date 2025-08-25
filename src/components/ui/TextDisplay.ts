@@ -1,5 +1,5 @@
-import * as PIXI from 'pixi.js';
-import { gsap } from 'gsap';
+import * as PIXI from "pixi.js";
+import { gsap } from "gsap";
 
 export interface TextDisplayOptions {
   fontSize?: number;
@@ -14,24 +14,26 @@ export interface TextDisplayOptions {
   borderColor?: number;
   width?: number;
   height?: number;
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
 }
 
 export class TextDisplay extends PIXI.Container {
   private background: PIXI.Graphics;
   private textField: PIXI.Text;
   private options: Required<TextDisplayOptions>;
-  private _value: string | number = '';
+  private _value: string | number = "";
 
-  constructor(initialValue: string | number = '', options: TextDisplayOptions = {}) {
+  constructor(
+    initialValue: string | number = "",
+    options: TextDisplayOptions = {}
+  ) {
     super();
 
-    // Set default options
     this.options = {
       fontSize: 16,
       fontColor: 0xffffff,
-      fontFamily: 'Arial, sans-serif',
-      fontWeight: 'normal',
+      fontFamily: "Arial, sans-serif",
+      fontWeight: "normal",
       backgroundColor: 0x2c3e50,
       backgroundAlpha: 0.8,
       padding: 8,
@@ -40,7 +42,7 @@ export class TextDisplay extends PIXI.Container {
       borderColor: 0x34495e,
       width: 120,
       height: 32,
-      align: 'center',
+      align: "center",
       ...options,
     };
 
@@ -97,13 +99,11 @@ export class TextDisplay extends PIXI.Container {
       });
     }
 
-    // Position text based on alignment
     this.textField.anchor.set(0.5);
     this.textField.x = 0;
     this.textField.y = 0;
   }
 
-  // Public methods
   get value(): string | number {
     return this._value;
   }
@@ -120,70 +120,86 @@ export class TextDisplay extends PIXI.Container {
   // Animated value update (useful for counters)
   animateToValue(targetValue: number, duration: number = 1): Promise<void> {
     return new Promise((resolve) => {
-      const startValue = typeof this._value === 'number' ? this._value : 0;
-      
-      gsap.to({ value: startValue }, {
-        value: targetValue,
-        duration,
-        ease: 'power2.out',
-        onUpdate: (tween) => {
-          const currentValue = Math.round(tween.targets()[0].value);
-          this.value = currentValue;
-        },
-        onComplete: () => {
-          this.value = targetValue;
-          resolve();
-        },
-      });
+      const startValue = typeof this._value === "number" ? this._value : 0;
+
+      gsap.to(
+        { value: startValue },
+        {
+          value: targetValue,
+          duration,
+          ease: "power2.out",
+          onUpdate: (tween) => {
+            const currentValue = Math.round(tween.targets()[0].value);
+            this.value = currentValue;
+          },
+          onComplete: () => {
+            this.value = targetValue;
+            resolve();
+          },
+        }
+      );
     });
   }
 
   // Format number with commas (for currency/scores)
-  setFormattedNumber(value: number, prefix: string = '', suffix: string = ''): void {
+  setFormattedNumber(
+    value: number,
+    prefix: string = "",
+    suffix: string = ""
+  ): void {
     const formatted = value.toLocaleString();
     this.value = `${prefix}${formatted}${suffix}`;
   }
 
-  // Set currency format
-  setCurrency(value: number, symbol: string = '$'): void {
+  setCurrency(value: number, symbol: string = "$"): void {
     this.setFormattedNumber(value, symbol);
   }
 
   // Animate currency change
-  animateCurrency(targetValue: number, symbol: string = '$', duration: number = 1): Promise<void> {
+  animateCurrency(
+    targetValue: number,
+    symbol: string = "$",
+    duration: number = 1
+  ): Promise<void> {
     return new Promise((resolve) => {
-      const startValue = typeof this._value === 'string' 
-        ? parseFloat(this._value.replace(/[^0-9.-]+/g, '')) || 0
-        : (typeof this._value === 'number' ? this._value : 0);
-      
-      gsap.to({ value: startValue }, {
-        value: targetValue,
-        duration,
-        ease: 'power2.out',
-        onUpdate: (tween) => {
-          const currentValue = Math.round(tween.targets()[0].value);
-          this.setCurrency(currentValue, symbol);
-        },
-        onComplete: () => {
-          this.setCurrency(targetValue, symbol);
-          resolve();
-        },
-      });
+      const startValue =
+        typeof this._value === "string"
+          ? parseFloat(this._value.replace(/[^0-9.-]+/g, "")) || 0
+          : typeof this._value === "number"
+          ? this._value
+          : 0;
+
+      gsap.to(
+        { value: startValue },
+        {
+          value: targetValue,
+          duration,
+          ease: "power2.out",
+          onUpdate: (tween) => {
+            const currentValue = Math.round(tween.targets()[0].value);
+            this.setCurrency(currentValue, symbol);
+          },
+          onComplete: () => {
+            this.setCurrency(targetValue, symbol);
+            resolve();
+          },
+        }
+      );
     });
   }
 
   // Flash effect for highlighting changes
   flash(color: number = 0xffff00, duration: number = 0.5): void {
     const originalColor = this.options.fontColor;
-    
+
     // Change to flash color
     this.textField.style.fill = color;
-    
+
     // Animate back to original color
     gsap.to(this.textField.style, {
       fill: originalColor,
       duration,
-      ease: 'power2.out',
+      ease: "power2.out",
     });
   }
 
@@ -193,7 +209,7 @@ export class TextDisplay extends PIXI.Container {
       x: scale,
       y: scale,
       duration: duration / 2,
-      ease: 'power2.out',
+      ease: "power2.out",
       yoyo: true,
       repeat: 1,
     });
@@ -205,7 +221,11 @@ export class TextDisplay extends PIXI.Container {
     this.updateVisuals();
   }
 
-  setColors(fontColor?: number, backgroundColor?: number, borderColor?: number): void {
+  setColors(
+    fontColor?: number,
+    backgroundColor?: number,
+    borderColor?: number
+  ): void {
     if (fontColor !== undefined) {
       this.options.fontColor = fontColor;
       this.textField.style.fill = fontColor;
@@ -219,7 +239,6 @@ export class TextDisplay extends PIXI.Container {
     this.updateVisuals();
   }
 
-  // Cleanup
   override destroy(): void {
     gsap.killTweensOf(this.scale);
     gsap.killTweensOf(this.textField.style);

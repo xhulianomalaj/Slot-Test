@@ -13,13 +13,12 @@ export class Symbol extends PIXI.Container {
     this._type = type;
     this._config = config;
 
-    // Create the sprite with the provided texture
     this._sprite = new PIXI.Sprite(texture);
     this._sprite.anchor.set(0.5);
 
     // Scale 16x16 sprites to a smaller, more appropriate size
     const targetSize = 60;
-    const sourceSize = 16; // Original sprite size
+    const sourceSize = 16;
     const scale = targetSize / sourceSize;
     this._sprite.scale.set(scale);
 
@@ -38,24 +37,15 @@ export class Symbol extends PIXI.Container {
     return this._sprite;
   }
 
-  /**
-   * Get payout multiplier for a given number of matching symbols
-   */
   getPayoutMultiplier(symbolCount: number): number {
     return this._config.payoutMultipliers[symbolCount] || 0;
   }
 
-  /**
-   * Set the size of the symbol sprite
-   */
   override setSize(width: number, height: number): void {
     this._sprite.width = width;
     this._sprite.height = height;
   }
 
-  /**
-   * Play landing animation when symbol stops on reel
-   */
   playLandingAnimation(): Promise<void> {
     return new Promise((resolve) => {
       // Simple bounce animation - will be enhanced with GSAP later
@@ -84,23 +74,14 @@ export class Symbol extends PIXI.Container {
     });
   }
 
-  /**
-   * Highlight this symbol (for winning combinations)
-   */
   highlight(): void {
-    this._sprite.tint = 0xffff00; // Yellow tint for highlighting
+    this._sprite.tint = 0xffff00;
   }
 
-  /**
-   * Remove highlight from this symbol
-   */
   removeHighlight(): void {
-    this._sprite.tint = 0xffffff; // Reset to white (no tint)
+    this._sprite.tint = 0xffffff;
   }
 
-  /**
-   * Cleanup resources
-   */
   override destroy(): void {
     this._sprite.destroy();
     super.destroy();

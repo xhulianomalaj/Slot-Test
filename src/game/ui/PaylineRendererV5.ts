@@ -4,10 +4,6 @@ import { PaylineStateManager } from "../state/PaylineStateManager";
 import { PaylineDrawing } from "./PaylineDrawing";
 import type { GameStateManager } from "../state/GameStateManager";
 
-/**
- * PaylineRenderer using XState v5 for state management
- * Handles rendering and animation of paylines based on state machine events
- */
 export class PaylineRendererV5 extends PIXI.Container {
   private stateManager: PaylineStateManager;
   private gameStateManager: GameStateManager | undefined;
@@ -29,7 +25,6 @@ export class PaylineRendererV5 extends PIXI.Container {
 
     this.gameStateManager = gameStateManager;
 
-    // Initialize state manager and drawing
     this.stateManager = new PaylineStateManager();
     this.drawing = new PaylineDrawing(this);
 
@@ -40,11 +35,7 @@ export class PaylineRendererV5 extends PIXI.Container {
     this.setupContainerSkipHandler();
   }
 
-  /**
-   * Setup callbacks for state machine events
-   */
   private setupStateCallbacks(): void {
-    // Handle win display updates - THIS IS NOW PROMISE-BASED
     this.stateManager.onWinDisplay(
       async (wins: WinResult[], currentIndex?: number) => {
         this.currentWins = wins;
@@ -52,26 +43,24 @@ export class PaylineRendererV5 extends PIXI.Container {
 
         // Actually draw the paylines based on the state machine's instructions
         if (wins.length === 0) {
-          // Clear all paylines when no wins
           this.drawing.clearAllPaylines();
         } else if (currentIndex === undefined) {
           // Show all wins statically (for multiple wins preview)
           this.drawing.clearAllPaylines();
           for (const win of wins) {
-            await this.drawing.drawWinningPayline(win, false); // No animation for "show all"
+            await this.drawing.drawWinningPayline(win, false);
           }
         } else {
           // Show individual win with animation
           this.drawing.clearAllPaylines();
           const win = wins[currentIndex];
           if (win) {
-            await this.drawing.drawWinningPayline(win, true); // With animation for individual wins
+            await this.drawing.drawWinningPayline(win, true);
           }
         }
       }
     );
 
-    // Handle animation lifecycle
     this.stateManager.setAnimationCallbacks({
       onStart: () => {
         this.onAnimationStart?.();
@@ -87,9 +76,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     });
   }
 
-  /**
-   * Setup container-level and global click handlers for skipping animations
-   */
   private setupContainerSkipHandler(): void {
     // Container-level click handler
     this.eventMode = "static";
@@ -113,9 +99,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     }
   }
 
-  /**
-   * Set callbacks for animation start/end events
-   */
   setAnimationCallbacks(
     onStart?: () => void,
     onEnd?: () => void,
@@ -125,7 +108,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     this.onAnimationEnd = onEnd;
     this.onAnimationSkipped = onSkipped;
 
-    // Update the state manager callbacks as well
     this.stateManager.setAnimationCallbacks({
       onStart: () => this.onAnimationStart?.(),
       onEnd: () => this.onAnimationEnd?.(),
@@ -133,10 +115,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     });
   }
 
-  /**
-   * Show winning paylines using the state machine
-   * Returns a promise that resolves when the animation sequence is complete
-   */
   async showWinningPaylines(wins: WinResult[]): Promise<void> {
     if (wins.length === 0) {
       this.clearAll();
@@ -144,7 +122,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     }
 
     return new Promise<void>((resolve) => {
-      // Set up one-time completion callback
       const originalOnEnd = this.onAnimationEnd;
       const originalOnSkipped = this.onAnimationSkipped;
 
@@ -164,7 +141,6 @@ export class PaylineRendererV5 extends PIXI.Container {
         cleanup();
       };
 
-      // Start the state machine evaluation
       // Note: We bypass evaluation since wins are already calculated
       // Instead, we manually set the wins and start animation
       this.stateManager.reset();
@@ -178,27 +154,15 @@ export class PaylineRendererV5 extends PIXI.Container {
     });
   }
 
-  /**
-   * Trigger win animation directly (bypassing evaluation)
-   * This is a helper for when wins are already calculated
-   */
   private triggerWinAnimation(wins: WinResult[]): void {
-    // Use the state manager method to set wins and start animation
     this.stateManager.setWinsAndAnimate(wins);
   }
 
-  /**
-   * Start payline evaluation for given reel results
-   */
   evaluateAndShowPaylines(reelResults: any[][]): void {
-    // Get current bet from game state manager, fallback to config default
     const currentBet = this.gameStateManager?.currentBet ?? 20;
     this.stateManager.evaluatePaylines(reelResults, currentBet);
   }
 
-  /**
-   * Skip current animation
-   */
   skipAnimation(): void {
     // Force cleanup of any running animations to prevent errors
     this.drawing.forceCleanup();
@@ -206,40 +170,25 @@ export class PaylineRendererV5 extends PIXI.Container {
     this.stateManager.skipAnimation();
   }
 
-  /**
-   * Clear all payline drawings
-   */
   clearAll(): void {
     this.drawing.clearAllPaylines();
     this.currentWins = [];
     this.isShowingAll = false;
   }
 
-  /**
-   * Hide all paylines
-   */
   hideAllPaylines(): void {
     this.clearAll();
   }
 
-  /**
-   * Set animation speed (0.1 to 5.0)
-   */
   setAnimationSpeed(speed: number): void {
     this.stateManager.setAnimationSpeed(speed);
-    this.drawing.setAnimationSpeed(speed); // Pass speed to drawing class
+    this.drawing.setAnimationSpeed(speed);
   }
 
-  /**
-   * Toggle showing all paylines at once vs cycling
-   */
   toggleShowAllMode(): void {
     this.stateManager.toggleShowAll();
   }
 
-  /**
-   * Get current animation state information
-   */
   getAnimationState(): {
     isAnimating: boolean;
     currentState: string;
@@ -257,60 +206,37 @@ export class PaylineRendererV5 extends PIXI.Container {
     };
   }
 
-  /**
-   * Check if paylines are currently animating (same method used by internal click handler)
-   */
   isAnimating(): boolean {
     return this.stateManager.isAnimating();
   }
 
-  /**
-   * Get current wins being displayed
-   */
   getCurrentWins(): WinResult[] {
     return this.currentWins;
   }
 
-  /**
-   * Check if currently showing all wins or cycling through individual wins
-   */
   isShowingAllWins(): boolean {
     return this.isShowingAll;
   }
 
-  /**
-   * Get debug information about the current state
-   */
   getDebugInfo(): any {
     return this.stateManager.getDebugInfo();
   }
 
-  /**
-   * Reset the payline renderer to initial state
-   */
   reset(): void {
     this.clearAll();
     this.stateManager.reset();
   }
 
-  /**
-   * Cleanup resources when the renderer is no longer needed
-   */
   dispose(): void {
     this.clearAll();
     this.stateManager.dispose();
     this.removeAllListeners();
 
-    // Remove from parent if it has one
     if (this.parent) {
       this.parent.removeChild(this);
     }
   }
 
-  /**
-   * Manual control: show specific payline by index
-   * This bypasses the state machine for direct control
-   */
   showSpecificWin(winIndex: number): void {
     if (winIndex >= 0 && winIndex < this.currentWins.length) {
       const win = this.currentWins[winIndex];
@@ -319,10 +245,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     }
   }
 
-  /**
-   * Manual control: show all current wins
-   * This bypasses the state machine for direct control
-   */
   showAllCurrentWins(): void {
     this.drawing.clearAllPaylines();
     this.currentWins.forEach((win) => {
@@ -330,9 +252,6 @@ export class PaylineRendererV5 extends PIXI.Container {
     });
   }
 
-  /**
-   * Cleanup resources
-   */
   override destroy(): void {
     // Clean up global click handler
     if (this.globalClickHandler && globalThis.document) {

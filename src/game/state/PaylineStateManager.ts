@@ -2,10 +2,6 @@ import { createActor } from "xstate";
 import { paylineStateMachine } from "./PaylineStateMachine";
 import type { WinResult, SymbolType } from "../../types";
 
-/**
- * PaylineStateManager using XState v5 for managing payline animations
- * This matches the behavior of the old logic but uses XState for state management
- */
 export class PaylineStateManager {
   private actor: ReturnType<typeof createActor<typeof paylineStateMachine>>;
   private onWinDisplayCallbacks: Array<
@@ -19,7 +15,6 @@ export class PaylineStateManager {
   private currentWins: WinResult[] = [];
 
   constructor() {
-    // Create the XState actor
     this.actor = createActor(paylineStateMachine);
 
     // Subscribe to state changes and handle the animation flow
@@ -27,7 +22,6 @@ export class PaylineStateManager {
       this.handleStateChange(state);
     });
 
-    // Start the actor
     this.actor.start();
   }
 
@@ -57,7 +51,6 @@ export class PaylineStateManager {
 
       case "idle":
         if (this.currentWins.length > 0) {
-          // Clear paylines when returning to idle
           await this.clearAllPaylines();
           this.currentWins = [];
         }
@@ -90,9 +83,7 @@ export class PaylineStateManager {
     if (currentWinIndex < winResults.length) {
       // Individual win animation logging removed
 
-      // If this is the first individual animation, clear all static lines first
       if (currentWinIndex === 0) {
-        // Clear logging removed
         await this.clearAllPaylines();
       }
 
@@ -118,7 +109,6 @@ export class PaylineStateManager {
   }
 
   private async clearAllPaylines(): Promise<void> {
-    // Clear all paylines by calling the renderer with empty array
     await this.triggerWinDisplayCallbacks([], undefined);
   }
 

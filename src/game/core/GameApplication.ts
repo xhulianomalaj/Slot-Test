@@ -15,7 +15,6 @@ export class GameApplication {
 
   public async initialize(): Promise<void> {
     try {
-      // Initialize PixiJS Application with configuration
       await this.app.init({
         canvas: this.canvas,
         width: window.innerWidth,
@@ -27,22 +26,16 @@ export class GameApplication {
         powerPreference: "high-performance",
       });
 
-      // Set up resize handling
       this.setupResizeHandler();
 
-      // Initialize asset loading pipeline
       await this.loadAssets();
 
-      // Initialize sound manager
       await this.initializeSoundManager();
 
-      // Add game scene to stage
       this.app.stage.addChild(this.gameScene);
 
-      // Initialize game scene
       await this.gameScene.setup();
 
-      // Ensure proper sizing after setup
       this.gameScene.resize(window.innerWidth, window.innerHeight);
     } catch (error) {
       throw error;
@@ -54,23 +47,18 @@ export class GameApplication {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
-      // Resize the application
       this.app.renderer.resize(width, height);
 
-      // Update game scene layout
       this.gameScene.resize(width, height);
     };
 
-    // Initial resize
     resize();
 
-    // Listen for window resize events
     window.addEventListener("resize", resize);
   }
 
   private async loadAssets(): Promise<void> {
     try {
-      // Asset loading pipeline ready for future implementation
     } catch (error) {
       throw error;
     }
@@ -85,7 +73,6 @@ export class GameApplication {
         "Failed to initialize SoundManager, continuing without sound:",
         error
       );
-      // Don't throw the error - the game should continue without sound if needed
     }
   }
 
@@ -99,7 +86,6 @@ export class GameApplication {
   public destroy(): void {
     window.removeEventListener("resize", this.resize);
 
-    // Cleanup sound manager
     const soundManager = SoundManager.getInstance();
     soundManager.destroy();
 
