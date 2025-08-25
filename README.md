@@ -1,47 +1,43 @@
-# Slot Game
+# Fruit Slot Game
 
-A TypeScript slot machine game built with PixiJS v8, XState v5, and GSAP.
+A practice slot machine game featuring a 5-reel, 3-row grid with 20 paylines and colorful fruit symbols. Built with modern web technologies for learning game development concepts.
 
-## Features
+![Game Screenshot](./game.png)
 
-- 5-reel, 3-row slot machine with 25 paylines
-- Smooth animations using GSAP
-- State management with XState v5
-- Audio effects with pixi-sound
-- Full TypeScript support with strict mode
+## Game Description
+
+This is a classic fruit-themed slot machine where players:
+
+- Spin 5 reels with various fruit symbols (Apple, Orange, Cherry, Strawberry, etc.)
+- Match 3 or more identical symbols on any of the 20 paylines to win
+- Enjoy smooth animations and sound effects
+- View game rules and payouts through an info panel
 
 ## Technology Stack
 
-- **PixiJS v8**: Graphics rendering and display object management
-- **TypeScript**: Type safety and modern JavaScript features
-- **XState v5**: Finite state machine for game state management
-- **GSAP**: High-performance animations and tweening
-- **pixi-sound**: Audio management and sound effects
-- **Vite**: Development server and build tooling
+- **PixiJS v8**: 2D graphics rendering and game engine
+- **TypeScript**: Type-safe development with modern JavaScript
+- **XState v5**: State management for game flow and logic
+- **GSAP**: Smooth animations and transitions
+- **Vite**: Fast development server and optimized builds
 
 ## Development
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm dev
 
 # Build for production
-npm run build
-
-# Preview production build
-npm run preview
+pnpm build
 ```
 
-## Project Structure
+## Key Features
 
-```
-src/
-├── assets/          # Game assets (images, sounds)
-├── components/      # Reusable game components
-├── game/           # Core game logic and state
-├── types/          # TypeScript type definitions
-└── utils/          # Utility functions
-```
+- Responsive design that works on desktop and mobile
+- Audio controls for music and sound effects
+- Comprehensive info panel with rules and payline patterns
+- Real-time win detection and payout calculations
+- Smooth reel spinning animations

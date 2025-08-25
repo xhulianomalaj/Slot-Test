@@ -1,0 +1,325 @@
+/* OPERA GX NUCLEAR OVERRIDE - Force light mode */
+* {
+  color-scheme: light only !important;
+}
+
+/* Disable Opera GX dark mode for our components */
+.info-panel,
+.info-panel *,
+.info-panel-overlay,
+.info-panel-header,
+.info-panel-content {
+  color-scheme: light only !important;
+  -webkit-color-scheme: light only !important;
+  forced-color-adjust: none !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+/* Force browser to apply our styles */
+.info-panel {
+  -webkit-text-fill-color: initial !important;
+  -webkit-appearance: none !important;
+  filter: none !important;
+}
+
+.info-panel * {
+  color: black !important;
+  background-color: inherit !important;
+  -webkit-text-fill-color: black !important;
+  -moz-appearance: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  filter: none !important;
+}
+
+.info-panel .close-button {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  background-color: #dc3545 !important;
+}
+
+.info-panel .payout-table thead {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  background-color: black !important;
+}
+
+.info-panel .payout-table th {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  background-color: black !important;
+}
+
+.info-panel .multiplier {
+  color: #28a745 !important;
+  -webkit-text-fill-color: #28a745 !important;
+}
+
+.info-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+}
+
+.info-panel {
+  background: white !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid #ddd;
+  color: black !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: black !important;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.info-panel-header {
+  background: white !important;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: black !important;
+}
+
+.info-panel-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: black !important;
+}
+
+.close-button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background: #c82333;
+}
+
+.info-panel-content {
+  padding: 20px;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+  line-height: 1.6;
+  background: white !important;
+  color: black !important;
+}
+
+.rules-section {
+  margin-bottom: 40px;
+}
+
+.rules-section h2, .payouts-section h2 {
+  color: #2c3e50 !important;
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+}
+
+.rules-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 25px 0;
+}
+
+.rules-section li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  padding-left: 20px;
+}
+
+.rules-section li:before {
+  content: "•";
+  color: #007bff;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.rules-section li:last-child {
+  border-bottom: none;
+}
+
+.payout-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.payout-table thead {
+  background: black;
+  color: white;
+}
+
+.payout-table th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.payout-table th:first-child {
+  width: 40%;
+}
+
+.payout-table th:not(:first-child) {
+  text-align: center;
+  width: 20%;
+}
+
+.payout-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s;
+  background: white;
+}
+
+.payout-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.payout-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.payout-table td {
+  padding: 12px;
+  font-size: 16px;
+  color: black;
+}
+
+.symbol-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+  color: black;
+}
+
+.symbol-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.symbol-name {
+  font-weight: bold;
+  color: black;
+}
+
+.payout-value {
+  text-align: center;
+  color: black;
+}
+
+.payout-highest {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.footer-notes {
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.footer-notes p {
+  margin: 5px 0;
+  color: black;
+  font-size: 14px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .info-panel {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .info-panel-header {
+    padding: 15px 20px;
+  }
+  
+  .info-panel-header h1 {
+    font-size: 24px;
+  }
+  
+  .info-panel-content {
+    padding: 20px;
+  }
+  
+  .payout-table th,
+  .payout-table td {
+    padding: 8px 6px;
+    font-size: 14px;
+  }
+
+  .symbol-cell {
+    gap: 8px;
+  }
+
+  .symbol-image {
+    width: 24px;
+    height: 24px;
+  }
+
+  .symbol-name {
+    font-size: 13px;
+  }
+}
+
+/* Custom scrollbar */
+.info-panel-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.info-panel-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.info-panel-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.info-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
