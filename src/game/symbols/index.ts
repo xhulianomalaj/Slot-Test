@@ -1,5 +1,6 @@
 export { Symbol } from './Symbol';
 export { SymbolFactory } from './SymbolFactory';
+export { SymbolPool } from './SymbolPool';
 export { 
   SYMBOL_CONFIGS, 
   getSymbolConfig, 

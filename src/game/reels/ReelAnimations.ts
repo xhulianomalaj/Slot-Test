@@ -137,7 +137,7 @@ export class ReelAnimations {
 
         // Replace the symbol
         this._removeChildCallback(currentSymbol);
-        currentSymbol.destroy();
+        this._symbolFactory.returnSymbol(currentSymbol); // Return to pool instead of destroy
         this._addChildCallback(newSymbol);
 
         this._symbols[randomIndex] = newSymbol;

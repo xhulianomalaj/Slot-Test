@@ -82,6 +82,27 @@ export class Symbol extends PIXI.Container {
     this._sprite.tint = 0xffffff;
   }
 
+  /**
+   * Reset symbol to clean state for object pooling
+   */
+  reset(): void {
+    // Reset visual properties
+    this.removeHighlight();
+    this.x = 0;
+    this.y = 0;
+    this.rotation = 0;
+    this.alpha = 1;
+    this.scale.set(1);
+    this.visible = true;
+    
+    // Reset sprite properties
+    this._sprite.anchor.set(0.5);
+    const targetSize = 60;
+    const sourceSize = 16;
+    const scale = targetSize / sourceSize;
+    this._sprite.scale.set(scale);
+  }
+
   override destroy(): void {
     this._sprite.destroy();
     super.destroy();

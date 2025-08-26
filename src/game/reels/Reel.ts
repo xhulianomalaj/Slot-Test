@@ -99,7 +99,7 @@ export class Reel extends PIXI.Container {
       const newType = generateSymbol();
 
       this.removeChild(symbol);
-      symbol.destroy();
+      this._symbolFactory.returnSymbol(symbol); // Return to pool instead of destroy
 
       const newSymbol = this._symbolFactory.createSymbol(newType);
       newSymbol.x = symbol.x;
@@ -132,7 +132,7 @@ export class Reel extends PIXI.Container {
         const symbolIndex = this._symbols.indexOf(currentSymbol);
 
         this.removeChild(currentSymbol);
-        currentSymbol.destroy();
+        this._symbolFactory.returnSymbol(currentSymbol); // Return to pool instead of destroy
 
         const newSymbol = this._symbolFactory.createSymbol(symbolType);
         newSymbol.x = symbolX;
@@ -223,7 +223,7 @@ export class Reel extends PIXI.Container {
   override destroy(): void {
     this.forceStop();
     this._symbols.forEach((symbol) => {
-      symbol.destroy();
+      this._symbolFactory.returnSymbol(symbol); // Return to pool instead of destroy
     });
     this._symbols = [];
     super.destroy();
