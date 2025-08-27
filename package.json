@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "license": "CC-BY-NC-4.0",
+  "author": "xhulianomalaj",
+  "description": "A fruit-themed slot machine game built with PixiJS",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
