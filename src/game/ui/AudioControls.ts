@@ -139,7 +139,10 @@ export class AudioControls extends PIXI.Container {
       return;
     }
 
-    this.currentInfoPanel = new InfoPanel();
+    this.currentInfoPanel = new InfoPanel(() => {
+      // Reset the reference when the panel is closed
+      delete this.currentInfoPanel;
+    });
     this.currentInfoPanel.show();
   }
 
